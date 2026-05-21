@@ -1,0 +1,65 @@
+===PAGE 1===
+Assignment: Database and Information Systems 
+COMP2013J: Databases and Information Systems 
+Weight: 30% of final grade 
+This assignment is a group programming project. As informed previously, failure to fill out 
+the form before 11th April will result in a penalty (10% deduction). If you have suffered any 
+problems building your team, please contact our head TA, Jie Chen 
+(jie.chen1@ucdconnect.ie), as soon as possible so we can help you get placed into a 
+team. Note: the head TA has the right to add a new team member to a team with fewer 
+than five members. 
+This is a self-proposed project, you can develop any information system you wish, so long 
+as it meets the following criteria: 
+•It is an information system. 
+•It must include a database system, and the database should be complex enough to 
+cover the knowledge learned from the lectures and labs.  
+•It can include a nice user interface. e.g. Web, application, etc. 
+•The system you proposed must be implemented by using a Java-based solution, and 
+also any ORM technology and complicated MVC frameworks are not recommended. 
+•There is a clear division of labour between team members. 
+•It is legal. 
+The assignment will start from Week 8. From week 10, each group needs to write down 
+their self-assessing for the previous two weeks (One paragraph)  and the group plan for 
+the next two weeks (One paragraph) and email it to our head TA, Jie Chen 
+(jie.chen1@ucdconnect.ie). In other words, every team needs to send this tiny report 
+every two weeks in week 10 and week 12. The email subject should be “COMP2013J 
+GroupXX WeekYY” (e.g., COMP2013J Group01 Week10). When the project finished, 
+these self-assessing records should be attached as appendixes into your report. 
+At the end of the semester, each group must write a report documenting all aspects of the 
+project. The report should include but not limit to the following sections:  
+•System Description (Describe the system you want to build and document any 
+assumptions that you make.) 
+
+===PAGE 2===
+•Tasks. (Every step of your design and implementation process, e.g. Creating ER 
+diagram to model a database for your system, Mapping the ER diagram to a relational 
+model, CREATE TABLE statements for your relational model, etc.) 
+•Team Member Contribution. 
+•Self-assessing and self-feedback records. 
+The report should have screenshots of the user interface and other necessary diagrams. 
+Each group must prepare a video (around 5 mins) to present their system. All group 
+members are expected to participate equally in the preparation and delivery; unequal 
+participation will reduce grade awarded. 
+The interview of each group will be held on after submission. The timetable for each group 
+will be given later. Each group will have 10-15 mins (5 mins for your live demonstration 
+and 5-10 mins for QA).  
+Note 
+•This assignment may require you to do some independent research outside of what is 
+directly covered in the lectures.  
+•Any software code should be included as a .zip file and uploaded to Brighspace. The 
+files uploaded should be complete and in the correct format, i.e. it should be possible to 
+download, compile (if applicable) and run. 
+•Only one member should make the submission. 
+•Be careful, a sophisticated system without track records (plans and self-assessment 
+reports) or a good explanation and understanding during the interview will receive little 
+credit. 
+•Any AI Assistants in writing your report must be explicitly and clearly stated. 
+•The deadline for submission (a pdf copy of the report, a video, a zip file including 
+code, and data) will be 1st June. Note, these files must be submitted as an individual 
+file, i.e., your pdf report and your video must be submitted as an individual file, 
+which should not be compressed into the zip file. 
+Grading 
+System Description System Design Interface Presentation (including 
+videos)
+5% 60% 20% 15%
+

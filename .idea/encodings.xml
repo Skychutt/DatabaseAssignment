@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/sql/stu_manage_backup.sql" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/webapp/assets/fonts/materialdesignicons.eot" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/webapp/assets/fonts/materialdesignicons.ttf" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/webapp/assets/fonts/materialdesignicons.woff" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/webapp/assets/fonts/materialdesignicons.woff2" charset="UTF-8" />
+  </component>
+</project>
