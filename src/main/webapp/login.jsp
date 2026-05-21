@@ -17,6 +17,7 @@
     <link href="${pageContext.request.contextPath}/assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/assets/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/assets/css/style.min.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/assets/css/lang-switcher.css" rel="stylesheet">
     <style>
         .lyear-wrapper {
             position: relative;
@@ -134,6 +135,7 @@
         </div>
     </div>
 </div>
+<jsp:include page="/WEB-INF/view/_lang_switcher.jsp"/>
 <script type="text/javascript" src="${pageContext.request.contextPath}/assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/assets/js/bootstrap.min.js"></script>
 <script type="text/javascript">

@@ -230,3 +230,4 @@
 
 </header>
 <!--End 头部信息-->
+<jsp:include page="_lang_switcher.jsp"/>

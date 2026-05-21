@@ -1,0 +1,45 @@
+/* 右下角中英文切换 */
+#lang-switcher {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 99999;
+    font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+    font-size: 13px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #ddd;
+}
+
+#lang-switcher .lang-switcher-inner {
+    display: flex;
+    flex-direction: column;
+}
+
+#lang-switcher .lang-btn {
+    display: block;
+    width: 72px;
+    padding: 10px 12px;
+    border: none;
+    background: #fff;
+    color: #333;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s, color 0.15s;
+}
+
+#lang-switcher .lang-btn:hover {
+    background: #f5f5f5;
+}
+
+#lang-switcher .lang-btn.active {
+    background: #33c2b9;
+    color: #fff;
+    font-weight: 600;
+}
+
+#lang-switcher .lang-btn + .lang-btn {
+    border-top: 1px solid #eee;
+}

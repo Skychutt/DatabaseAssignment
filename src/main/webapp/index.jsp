@@ -187,7 +187,7 @@
                 };
 
                 var ctxClazz = $('.js-chartjs-clazz')[0].getContext('2d');
-                new Chart(ctxClazz, {
+                window.__chartClazz = new Chart(ctxClazz, {
                     type: 'bar',
                     data: {
                         labels: chartLabels,
@@ -205,7 +205,7 @@
                 });
 
                 var ctxTc = $('.js-chartjs-teacher-course')[0].getContext('2d');
-                new Chart(ctxTc, {
+                window.__chartTc = new Chart(ctxTc, {
                     type: 'bar',
                     data: {
                         labels: ['教师', '课程'],
@@ -229,6 +229,19 @@
             },
             error: function (xhr) {
                 alert("请求服务器失败，状态码：" + xhr.status);
+            }
+        });
+
+        document.addEventListener('app-lang-change', function (e) {
+            var lang = e.detail;
+            if (window.__chartClazz && window.__chartClazz.data && window.__chartClazz.data.datasets[0]) {
+                window.__chartClazz.data.datasets[0].label = lang === 'en' ? 'Students' : '学生数';
+                window.__chartClazz.update();
+            }
+            if (window.__chartTc && window.__chartTc.data && window.__chartTc.data.datasets[0]) {
+                window.__chartTc.data.labels = lang === 'en' ? ['Teachers', 'Courses'] : ['教师', '课程'];
+                window.__chartTc.data.datasets[0].label = lang === 'en' ? 'Count' : '数量';
+                window.__chartTc.update();
             }
         });
     });
