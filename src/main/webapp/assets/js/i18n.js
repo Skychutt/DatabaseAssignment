@@ -1,7 +1,12 @@
 /**
  * 全站中英文切换（登录页 + 后台各页）
  * 用法：页面引入 i18n.js 与 _lang_switcher.jsp；文本节点按中文原文替换为英文
+ *
+ * @file i18n.js
+ * @global jQuery 由页面在 i18n.js 之后加载（见 _lang_switcher.jsp / 各页 script 顺序）
  */
+/* global jQuery, NodeFilter, CustomEvent */
+// noinspection JSNonAsciiCharacters
 (function (window) {
     "use strict";
 
@@ -123,7 +128,6 @@
         "新增教师": "Add teacher",
         "编辑教师": "Edit teacher",
         "请输入工号": "Teacher ID",
-        "请输入密码": "Password",
         "返回列表": "Back to list",
         "确定删除教师": "Delete teacher",
         "班级列表": "Class list",
@@ -168,8 +172,6 @@
         "暂无学生选您的课程，或课程尚未在系统中关联到您的工号。": "No students enrolled in your courses.",
         "保存": "Save",
         "选课记录管理（管理员）": "Enrollment records (admin)",
-        "移除": "Remove",
-        "系统公告": "Announcements",
         "发布人": "Publisher",
         "发布日期": "Publish date",
         "公告内容": "Content",
@@ -182,7 +184,6 @@
         "确定删除该公告吗？": "Delete this notice?",
         "填写个人档案": "Create archive",
         "修改个人档案": "Edit archive",
-        "个人档案": "Personal archive",
         "学号由系统自动关联，每人仅可拥有一份档案。": "Student ID is auto-linked; one archive per student.",
         "身份证号": "ID card",
         "民族": "Ethnicity",
@@ -202,7 +203,6 @@
         "如：统招、专升本": "e.g. Regular admission",
         "档案编号": "Archive ID",
         "您尚未填写个人档案。点击下方按钮创建后，可进行查看、修改与删除。": "No archive yet. Click below to create.",
-        "填写个人档案": "Create archive",
         "确定删除个人档案吗？删除后可重新填写。": "Delete archive? You can create again.",
         "角色": "Role",
         "学生": "Student",
@@ -213,7 +213,6 @@
         "新密码": "New password",
         "确认新密码": "Confirm password",
         "两次新密码不一致": "Passwords do not match",
-        "通讯录": "Directory",
         "管理员账号": "Admin accounts",
         "教师工号与姓名": "Teacher ID & name",
         "管理员通讯录": "Admin contacts",
@@ -504,17 +503,18 @@
     }
 
     function patchJQueryText() {
-        if (!window.jQuery || jQuery.fn._i18nTextPatched) {
+        var $ = window.jQuery;
+        if (!$ || $.fn._i18nTextPatched) {
             return;
         }
-        var origText = jQuery.fn.text;
-        jQuery.fn.text = function (value) {
+        var origText = $.fn.text;
+        $.fn.text = function (value) {
             if (value !== undefined && typeof value === "string" && getLang() === "en") {
                 value = translateMsg(value);
             }
             return origText.apply(this, arguments.length ? [value] : []);
         };
-        jQuery.fn._i18nTextPatched = true;
+        $.fn._i18nTextPatched = true;
     }
 
     function init() {
