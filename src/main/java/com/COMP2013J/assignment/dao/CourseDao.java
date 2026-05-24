@@ -84,7 +84,18 @@ public class CourseDao {
         return res;
     }
 
-    public PagerVO<Course> page(int current, int size, String whereSql) {
+    /** 在未满员时原子增加已选人数，返回是否成功 */
+    public boolean tryIncrementEnrollment(String cno) {
+        JdbcHelper helper = new JdbcHelper();
+        int res = helper.executeUpdate(
+                "update tb_course set `count` = IFNULL(`count`,0) + 1 where cno = ? "
+                        + "and (maximum is null or maximum <= 0 or IFNULL(`count`,0) < maximum)",
+                cno);
+        helper.closeDB();
+        return res == 1;
+    }
+
+    public PagerVO<Course> page(int current, int size, String whereSql, Object... whereParams) {
         PagerVO<Course> pagerVO = new PagerVO<>();
         pagerVO.setCurrent(current);
         pagerVO.setSize(size);
@@ -93,12 +104,13 @@ public class CourseDao {
             whereSql = " ";
         }
         try {
-            ResultSet resultSet = helper.executeQuery("select count(1) from tb_course " + whereSql);
+            ResultSet resultSet = helper.executeQuery("select count(1) from tb_course " + whereSql, whereParams);
             resultSet.next();
             pagerVO.setTotal(resultSet.getInt(1));
 
+            Object[] listParams = appendLimitParams(whereParams, (current - 1) * size, size);
             resultSet = helper.executeQuery(
-                    "select * from tb_course " + whereSql + " limit " + ((current - 1) * size) + "," + size);
+                    "select * from tb_course " + whereSql + " limit ?, ?", listParams);
             List<Course> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(toEntity(resultSet));
@@ -111,6 +123,16 @@ public class CourseDao {
             helper.closeDB();
         }
         return null;
+    }
+
+    private Object[] appendLimitParams(Object[] whereParams, int offset, int limit) {
+        Object[] listParams = new Object[(whereParams == null ? 0 : whereParams.length) + 2];
+        if (whereParams != null) {
+            System.arraycopy(whereParams, 0, listParams, 0, whereParams.length);
+        }
+        listParams[listParams.length - 2] = offset;
+        listParams[listParams.length - 1] = limit;
+        return listParams;
     }
 
     private Course toEntity(ResultSet resultSet) throws SQLException {

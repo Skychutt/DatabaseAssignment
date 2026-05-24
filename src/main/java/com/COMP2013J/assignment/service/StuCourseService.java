@@ -56,9 +56,7 @@ public class StuCourseService {
         if (stuCourseDao.exists(cno, sno)) {
             return "您已选过该课程";
         }
-        int enrolled = course.getCount() == null ? 0 : course.getCount();
-        Integer max = course.getMaximum();
-        if (max != null && max > 0 && enrolled >= max) {
+        if (!courseDao.tryIncrementEnrollment(cno)) {
             return "课程人数已满";
         }
         StuCourse row = new StuCourse();
@@ -67,8 +65,10 @@ public class StuCourseService {
         row.setChosetime(new Date(System.currentTimeMillis()));
         row.setScore(null);
         row.setEvaluation(null);
-        stuCourseDao.insert(row);
-        courseDao.changeEnrollmentCount(cno, 1);
+        if (stuCourseDao.insert(row) <= 0) {
+            courseDao.changeEnrollmentCount(cno, -1);
+            return "选课失败，请重试";
+        }
         return null;
     }
 
@@ -76,11 +76,20 @@ public class StuCourseService {
         if (sno == null || cno == null) {
             return "参数不完整";
         }
-        if (!stuCourseDao.exists(cno.trim(), sno.trim())) {
+        sno = sno.trim();
+        cno = cno.trim();
+        Course course = courseDao.getByCno(cno);
+        if (course == null) {
+            return "课程不存在";
+        }
+        if (!inChooseWindow(course)) {
+            return "当前不在该课程的退选时间内";
+        }
+        if (!stuCourseDao.exists(cno, sno)) {
             return "未找到选课记录";
         }
-        stuCourseDao.delete(cno.trim(), sno.trim());
-        courseDao.changeEnrollmentCount(cno.trim(), -1);
+        stuCourseDao.delete(cno, sno);
+        courseDao.changeEnrollmentCount(cno, -1);
         return null;
     }
 
@@ -136,7 +145,6 @@ public class StuCourseService {
         return cal.getTime();
     }
 
-    /** enddate 当天 23:59:59.999 仍可选：用「次日 0 点」作为截止时间（不含） */
     private java.util.Date dayAfter(java.util.Date d) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(d);

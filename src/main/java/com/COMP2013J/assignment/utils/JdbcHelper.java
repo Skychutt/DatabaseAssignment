@@ -1,109 +1,109 @@
 package com.COMP2013J.assignment.utils;
 
+import java.io.InputStream;
 import java.sql.*;
+import java.util.Properties;
+
 /**
- * 数据库操作公共类
- * 数据库配置信息
- * 提供最基本的和数据库交互的方法
+ * JDBC 工具类：配置从 classpath:jdbc.properties 读取，避免密码硬编码在源码中。
  */
 public class JdbcHelper {
 
-	private static final String className = "com.mysql.cj.jdbc.Driver";
-	private static final String url = "jdbc:mysql://localhost:3306/stu_manage?serverTimezone=GMT%2B8&characterEncoding=utf-8&allowPublicKeyRetrieval=true&useSSL=false";
-	private static final String user = "root"; 
-	private static final String pass = "Ctz20060712@";// 自行修改密码
-	
-	//测试
-	public static void main(String[] args) throws SQLException {
-		JdbcHelper jdbcHelper = new JdbcHelper();
-		ResultSet rs = jdbcHelper.executeQuery("select * from tb_student");
-		while (rs.next()){
-			String sno = rs.getString("sno");
-			String name = rs.getString("name");
-			Integer age = rs.getInt("age");
-			Date enterdate = rs.getDate("enterdate");
-			System.out.println(sno);
-			System.out.println(name);
-			System.out.println(age);
-			System.out.println(enterdate);
-			System.out.println();
-		}
-		jdbcHelper.closeDB();
-	}
+    private static final String className = "com.mysql.cj.jdbc.Driver";
+    private static final String url;
+    private static final String user;
+    private static final String pass;
 
-	private Connection conn = null;
-	private PreparedStatement pstmt = null;
-	private ResultSet rs = null;
+    static {
+        Properties props = new Properties();
+        try (InputStream in = JdbcHelper.class.getClassLoader().getResourceAsStream("jdbc.properties")) {
+            if (in != null) {
+                props.load(in);
+            }
+        } catch (Exception e) {
+            throw new ExceptionInInitializerError("无法加载 jdbc.properties: " + e.getMessage());
+        }
+        url = props.getProperty("jdbc.url",
+                "jdbc:mysql://localhost:3306/stu_manage?serverTimezone=GMT%2B8&characterEncoding=utf-8&allowPublicKeyRetrieval=true&useSSL=false");
+        user = props.getProperty("jdbc.user", "root");
+        pass = props.getProperty("jdbc.password", "");
+    }
 
-	//JdbcHelper类加载的时候，加载数据库驱动程序
-	static {
-		try {
-			Class.forName(className);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+    private Connection conn = null;
+    private PreparedStatement pstmt = null;
+    private ResultSet rs = null;
 
-	public JdbcHelper(){
-		try {
-			conn = DriverManager.getConnection(url,user,pass);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
+    static {
+        try {
+            Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
-	//执行查询    给 SELECT 用，返回 ResultSet（查到的数据）   Object... params 可以传 0 个、1 个、多个任意类型参数，自动打包成数组
-	public ResultSet executeQuery(String sql, Object... params){
-		try {
-			if (conn == null) {
-				return null;
-			}
-			pstmt = conn.prepareStatement(sql);  //创建预编译语句（最重要）
-			if (params != null) {  //给？占位符赋值（循环设置）
-				for (int i = 0; i < params.length; i++) {
-					pstmt.setObject(i + 1, params[i]);
-				}
-			}
-			rs = pstmt.executeQuery();  // 执行查询，返回结果集 这是 JDBC 自带的 PreparedStatement 方法
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return rs;
-	}
+    public JdbcHelper() {
+        try {
+            conn = DriverManager.getConnection(url, user, pass);
+            conn.setAutoCommit(true);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-	//执行增删改  专门给 INSERT、UPDATE、DELETE 用，返回的整数 = 数据库「被影响 / 改动了多少行」
-	public int executeUpdate(String sql, Object... params){
-		int row = -1;
-		try {
-			if (conn == null) {
-				return -1;
-			}
-			pstmt = conn.prepareStatement(sql);
-			if (params != null) {
-				for (int i = 0; i < params.length; i++) {
-					pstmt.setObject(i + 1, params[i]);
-				}
-			}
-			row = pstmt.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return row;
-	}
-	
-	public void closeDB(){
-		try{
-			if(rs != null){
-				rs.close();
-			}
-			if(pstmt != null){
-				pstmt.close();
-			}
-			if(conn != null){
-				conn.close();
-			}
-		}catch(SQLException e){
-			e.printStackTrace();
-		}
-	} 
+    public Connection getConnection() {
+        return conn;
+    }
+
+    public ResultSet executeQuery(String sql, Object... params) {
+        try {
+            if (conn == null) {
+                return null;
+            }
+            pstmt = conn.prepareStatement(sql);
+            bindParams(params);
+            rs = pstmt.executeQuery();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rs;
+    }
+
+    public int executeUpdate(String sql, Object... params) {
+        int row = -1;
+        try {
+            if (conn == null) {
+                return -1;
+            }
+            pstmt = conn.prepareStatement(sql);
+            bindParams(params);
+            row = pstmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return row;
+    }
+
+    private void bindParams(Object[] params) throws SQLException {
+        if (params != null) {
+            for (int i = 0; i < params.length; i++) {
+                pstmt.setObject(i + 1, params[i]);
+            }
+        }
+    }
+
+    public void closeDB() {
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+            if (pstmt != null) {
+                pstmt.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

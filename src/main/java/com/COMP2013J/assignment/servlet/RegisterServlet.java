@@ -2,7 +2,7 @@ package com.COMP2013J.assignment.servlet;
 
 import com.COMP2013J.assignment.entity.Student;
 import com.COMP2013J.assignment.entity.Teacher;
-import com.COMP2013J.assignment.service.AdminService;
+import com.COMP2013J.assignment.service.ClazzService;
 import com.COMP2013J.assignment.service.StudentService;
 import com.COMP2013J.assignment.service.TeacherService;
 import com.COMP2013J.assignment.utils.ApiResult;
@@ -11,20 +11,30 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.sql.Date;
 
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
 
-    private final AdminService adminService = new AdminService();
     private final StudentService studentService = new StudentService();
     private final TeacherService teacherService = new TeacherService();
+    private final ClazzService clazzService = new ClazzService();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("utf-8");
         resp.setContentType("application/json; charset=utf-8");
+
+        String captcha = req.getParameter("captcha");
+        Object sessionCaptcha = req.getSession().getAttribute("captcha");
+        if (captcha == null || sessionCaptcha == null
+                || !captcha.equalsIgnoreCase(String.valueOf(sessionCaptcha))) {
+            resp.getWriter().write(ApiResult.json(false, "验证码错误！"));
+            return;
+        }
+        req.getSession().removeAttribute("captcha");
 
         String usertype = req.getParameter("usertype");
         if (usertype == null) {
@@ -33,34 +43,28 @@ public class RegisterServlet extends HttpServlet {
         }
 
         if ("admin".equals(usertype)) {
-            String username = req.getParameter("username");
-            String password = req.getParameter("password");
-
-            String msg = adminService.register(username, password);
-            if (msg != null) {
-                resp.getWriter().write(ApiResult.json(false, msg));
-            } else {
-                resp.getWriter().write(ApiResult.json(true, "注册成功"));
-            }
+            resp.getWriter().write(ApiResult.json(false, "不允许自助注册管理员，请联系系统管理员添加账号。"));
             return;
         }
 
         if ("emp".equals(usertype)) {
-            // 复用登录页：username 当作学生学号 sno
             String sno = req.getParameter("username");
             String password = req.getParameter("password");
             String name = req.getParameter("name");
             String clazzno = req.getParameter("clazzno");
 
-            // StudentService.insert 只强制校验 sno/password/name/clazzno；
-            // 其它字段我们给默认值，避免数据库 NOT NULL 约束导致插入失败。
+            if (clazzService.getByClazzno(clazzno == null ? "" : clazzno.trim()) == null) {
+                resp.getWriter().write(ApiResult.json(false, "班级编号不存在，请填写正确的班级编号。"));
+                return;
+            }
+
             Student student = new Student();
             student.setSno(sno);
             student.setPassword(password);
             student.setName(name);
             student.setClazzno(clazzno);
             student.setGender("m");
-            student.setAge(0);
+            student.setAge(18);
             student.setTele("");
             student.setAddress("");
             student.setEnterdate(new Date(System.currentTimeMillis()));
@@ -96,4 +100,3 @@ public class RegisterServlet extends HttpServlet {
         resp.getWriter().write(ApiResult.json(false, "未知用户类型！"));
     }
 }
-

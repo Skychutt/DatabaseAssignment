@@ -17,13 +17,13 @@ import java.util.ArrayList;
 @WebServlet("/clazz")
 public class ClazzServlet extends HttpServlet {
     ClazzService clazzService = new ClazzService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setCharacterEncoding("utf-8");// 设置前端获取参数编码
+        req.setCharacterEncoding("utf-8");
         HttpSession session = req.getSession(false);
-        boolean canManage = RoleHelper.isAdmin(session) || RoleHelper.isTeacher(session);
+        boolean canManage = RoleHelper.isAdmin(session);
         req.setAttribute("canManageClazz", canManage);
-        // 查询参数
         String r = req.getParameter("r");
         if ("add".equals(r) || "edit".equals(r)) {
             if (!canManage) {
@@ -31,14 +31,14 @@ public class ClazzServlet extends HttpServlet {
                 return;
             }
         }
-        if(r == null){
+        if (r == null) {
             int current = parsePositiveInt(req.getParameter("current"), 1);
             int size = parsePositiveInt(req.getParameter("size"), 10);
             String clazzno = req.getParameter("clazzno");
             String name = req.getParameter("name");
             PagerVO<Clazz> pagerVO = new PagerVO<>();
             try {
-                PagerVO<Clazz> result = clazzService.page(current,size,clazzno,name);
+                PagerVO<Clazz> result = clazzService.page(current, size, clazzno, name);
                 if (result != null) {
                     pagerVO = result;
                 } else {
@@ -53,22 +53,22 @@ public class ClazzServlet extends HttpServlet {
                 pagerVO.setSize(size);
                 pagerVO.setTotal(0);
                 pagerVO.setList(new ArrayList<>());
-                req.setAttribute("errorMsg", "班级数据加载异常：" + e.getMessage());
+                req.setAttribute("errorMsg", "班级数据加载异常，请稍后重试。");
             }
             pagerVO.init();
 
-            req.setAttribute("clazzno",clazzno);
-            req.setAttribute("name",name);
-            req.setAttribute("size",pagerVO.getSize());
-            req.setAttribute("pagerVO",pagerVO);
+            req.setAttribute("clazzno", clazzno);
+            req.setAttribute("name", name);
+            req.setAttribute("size", pagerVO.getSize());
+            req.setAttribute("pagerVO", pagerVO);
             req.getRequestDispatcher("/WEB-INF/view/clazz-list.jsp").forward(req, resp);
             return;
         }
-        if("add".equals(r)){
+        if ("add".equals(r)) {
             req.getRequestDispatcher("/WEB-INF/view/clazz-add.jsp").forward(req, resp);
             return;
         }
-        if("edit".equals(r)){
+        if ("edit".equals(r)) {
             String clazzno = req.getParameter("clazzno");
             Clazz clazz = clazzService.getByClazzno(clazzno);
             if (clazz == null) {
@@ -83,51 +83,44 @@ public class ClazzServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setCharacterEncoding("utf-8");// 设置编码，否则从前端获取参数乱码
+        req.setCharacterEncoding("utf-8");
         resp.setContentType("application/json; charset=utf-8");
         HttpSession session = req.getSession(false);
-        if (!RoleHelper.isAdmin(session) && !RoleHelper.isTeacher(session)) {
-            resp.getWriter().write(ApiResult.json(false, "权限不足"));
+        if (!RoleHelper.isAdmin(session)) {
+            resp.getWriter().write(ApiResult.json(false, "仅管理员可维护班级信息"));
             return;
         }
-        //请求类型
         String r = req.getParameter("r");
-        if("add".equals(r) || "edit".equals(r)){
+        if ("add".equals(r) || "edit".equals(r)) {
             String clazzno = req.getParameter("clazzno");
             String name = req.getParameter("name");
             Clazz clazz = new Clazz();
             clazz.setName(name);
             clazz.setClazzno(clazzno);
-            if("add".equals(r)){
+            if ("add".equals(r)) {
                 String msg = clazzService.insert(clazz);
-                if(msg!=null){
-                    resp.getWriter().write(ApiResult.json(false,msg));
-                    return;
-                }else{
-                    resp.getWriter().write(ApiResult.json(true,"保存成功"));
-                    return;
+                if (msg != null) {
+                    resp.getWriter().write(ApiResult.json(false, msg));
+                } else {
+                    resp.getWriter().write(ApiResult.json(true, "保存成功"));
                 }
-            }else{
-                String msg = clazzService.update(clazz);
-                if(msg!=null){
-                    resp.getWriter().write(ApiResult.json(false,msg));
-                    return;
-                }else{
-                    resp.getWriter().write(ApiResult.json(true,"保存成功"));
-                    return;
-                }
+                return;
             }
+            String msg = clazzService.update(clazz);
+            if (msg != null) {
+                resp.getWriter().write(ApiResult.json(false, msg));
+            } else {
+                resp.getWriter().write(ApiResult.json(true, "保存成功"));
+            }
+            return;
         }
-        if("del".equals(r)){
-            //删除
+        if ("del".equals(r)) {
             String clazzno = req.getParameter("clazzno");
             String msg = clazzService.delete(clazzno);
-            if(msg!=null){
-                resp.getWriter().write(ApiResult.json(false,msg));
-                return;
-            }else{
-                resp.getWriter().write(ApiResult.json(true,"删除成功"));
-                return;
+            if (msg != null) {
+                resp.getWriter().write(ApiResult.json(false, msg));
+            } else {
+                resp.getWriter().write(ApiResult.json(true, "删除成功"));
             }
         }
     }
@@ -144,4 +137,3 @@ public class ClazzServlet extends HttpServlet {
         }
     }
 }
-

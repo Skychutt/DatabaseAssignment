@@ -55,20 +55,19 @@ public class ClazzDao {
     }
 
 
-    public PagerVO<Clazz> page(int current, int size, String whereSql){
+    public PagerVO<Clazz> page(int current, int size, String whereSql, Object... whereParams) {
         PagerVO<Clazz> pagerVO = new PagerVO<>();
         pagerVO.setCurrent(current);
         pagerVO.setSize(size);
         JdbcHelper helper = new JdbcHelper();
-        if(whereSql == null){
+        if (whereSql == null) {
             whereSql = " ";
         }
         try {
-            return queryPageWithClazzNoColumn(helper, pagerVO, whereSql, current, size, "clazzno");
+            return queryPageWithClazzNoColumn(helper, pagerVO, whereSql, whereParams, current, size, "clazzno");
         } catch (Exception first) {
-            // 兼容历史库字段名为 classno 的情况
             try {
-                return queryPageWithClazzNoColumn(helper, pagerVO, whereSql, current, size, "classno");
+                return queryPageWithClazzNoColumn(helper, pagerVO, whereSql, whereParams, current, size, "classno");
             } catch (Exception second) {
                 second.printStackTrace();
             }
@@ -79,9 +78,10 @@ public class ClazzDao {
     }
 
     private PagerVO<Clazz> queryPageWithClazzNoColumn(JdbcHelper helper, PagerVO<Clazz> pagerVO,
-                                                       String whereSql, int current, int size, String clazzNoColumn) throws Exception {
+                                                      String whereSql, Object[] whereParams,
+                                                      int current, int size, String clazzNoColumn) throws Exception {
         String finalWhereSql = whereSql == null ? " " : whereSql.replace("clazzno", clazzNoColumn);
-        ResultSet resultSet = helper.executeQuery("select count(1) from tb_clazz " + finalWhereSql);
+        ResultSet resultSet = helper.executeQuery("select count(1) from tb_clazz " + finalWhereSql, whereParams);
         if (resultSet == null) {
             return null;
         }
@@ -89,7 +89,8 @@ public class ClazzDao {
         int total = resultSet.getInt(1);
         pagerVO.setTotal(total);
 
-        resultSet = helper.executeQuery("select * from tb_clazz " + finalWhereSql + " limit " + ((current - 1) * size) + "," + size);
+        Object[] listParams = appendLimitParams(whereParams, (current - 1) * size, size);
+        resultSet = helper.executeQuery("select * from tb_clazz " + finalWhereSql + " limit ?, ?", listParams);
         if (resultSet == null) {
             return null;
         }
@@ -102,6 +103,16 @@ public class ClazzDao {
         }
         pagerVO.setList(list);
         return pagerVO;
+    }
+
+    private Object[] appendLimitParams(Object[] whereParams, int offset, int limit) {
+        Object[] listParams = new Object[(whereParams == null ? 0 : whereParams.length) + 2];
+        if (whereParams != null) {
+            System.arraycopy(whereParams, 0, listParams, 0, whereParams.length);
+        }
+        listParams[listParams.length - 2] = offset;
+        listParams[listParams.length - 1] = limit;
+        return listParams;
     }
 
 

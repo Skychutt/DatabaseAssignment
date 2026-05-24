@@ -3,7 +3,11 @@ package com.COMP2013J.assignment.service;
 import com.COMP2013J.assignment.dao.CourseDao;
 import com.COMP2013J.assignment.dao.TeacherDao;
 import com.COMP2013J.assignment.entity.Teacher;
+import com.COMP2013J.assignment.security.PasswordUtil;
 import com.COMP2013J.assignment.utils.vo.PagerVO;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TeacherService {
 
@@ -19,14 +23,17 @@ public class TeacherService {
     }
 
     public PagerVO<Teacher> page(int current, int size, String tno, String tname) {
-        String whereSql = " where 1=1 ";
+        StringBuilder whereSql = new StringBuilder(" where 1=1 ");
+        List<Object> params = new ArrayList<>();
         if (hasText(tname)) {
-            whereSql += " and tname like '%" + tname.trim() + "%'";
+            whereSql.append(" and tname like ?");
+            params.add("%" + tname.trim() + "%");
         }
         if (hasText(tno)) {
-            whereSql += " and tno = '" + tno.trim() + "'";
+            whereSql.append(" and tno = ?");
+            params.add(tno.trim());
         }
-        return dao.page(current, size, whereSql);
+        return dao.page(current, size, whereSql.toString(), params.toArray());
     }
 
     private boolean hasText(String value) {
@@ -37,39 +44,42 @@ public class TeacherService {
         dao.delete(tno);
     }
 
+    public String insert(Teacher teacher) {
+        if (!hasText(teacher.getTno())) {
+            return "工号不可为空";
+        }
+        if (!hasText(teacher.getPassword())) {
+            return "密码不可为空";
+        }
+        if (dao.getByTno(teacher.getTno().trim()) != null) {
+            return "工号已存在！";
+        }
+        teacher.setPassword(PasswordUtil.hash(teacher.getPassword()));
+        dao.insert(teacher);
+        return null;
+    }
+
+    public String update(Teacher teacher) {
+        if (!hasText(teacher.getTno())) {
+            return "工号不可为空";
+        }
+        if (teacher.getPassword() != null && teacher.getPassword().trim().isEmpty()) {
+            teacher.setPassword(null);
+        } else if (teacher.getPassword() != null) {
+            teacher.setPassword(PasswordUtil.hash(teacher.getPassword()));
+        }
+        dao.update(teacher);
+        return null;
+    }
+
     public String deleteWithCheck(String tno) {
-        if (tno == null || tno.trim().isEmpty()) {
+        if (!hasText(tno)) {
             return "工号不可为空";
         }
         if (courseDao.countByTno(tno.trim()) > 0) {
             return "该教师仍有关联课程，无法删除。";
         }
         dao.delete(tno.trim());
-        return null;
-    }
-
-    public String insert(Teacher teacher) {
-        if (teacher.getTno() == null || teacher.getTno().isEmpty()) {
-            return "教师工号不可为空！";
-        }
-        if (teacher.getPassword() == null || teacher.getPassword().isEmpty()) {
-            return "密码不可为空！";
-        }
-        if (teacher.getTname() == null || teacher.getTname().isEmpty()) {
-            return "姓名不可为空！";
-        }
-        if (dao.getByTno(teacher.getTno()) != null) {
-            return "工号已存在！";
-        }
-        dao.insert(teacher);
-        return null;
-    }
-
-    public String update(Teacher teacher) {
-        if (teacher.getTno() == null || teacher.getTno().isEmpty()) {
-            return "被修改教师工号不可为空！";
-        }
-        dao.update(teacher);
         return null;
     }
 }

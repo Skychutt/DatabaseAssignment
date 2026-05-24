@@ -1,4 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="com.COMP2013J.assignment.entity.Teacher" %>
+<%
+    Boolean courseAdminMode = Boolean.TRUE.equals(request.getAttribute("courseAdminMode"));
+    Teacher loginTeacher = null;
+    if (!courseAdminMode && session.getAttribute("user") instanceof Teacher) {
+        loginTeacher = (Teacher) session.getAttribute("user");
+    }
+%>
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -29,7 +37,10 @@
                                         </div>
                                         <div class="col-md-4 form-group">
                                             <label>教师工号</label>
-                                            <input class="form-control" type="text" id="tno" placeholder="须已在教师表中存在">
+                                            <input class="form-control" type="text" id="tno"
+                                                   value="<%= loginTeacher != null ? loginTeacher.getTno() : "" %>"
+                                                   placeholder="须已在教师表中存在"
+                                                   <%= courseAdminMode ? "" : "readonly" %>>
                                         </div>
                                         <div class="col-md-4 form-group">
                                             <label>课程名</label>
@@ -55,10 +66,12 @@
                                             <label>人数上限</label>
                                             <input class="form-control" type="number" id="maximum" placeholder="可选">
                                         </div>
+                                        <% if (courseAdminMode) { %>
                                         <div class="col-md-4 form-group">
                                             <label>已选人数</label>
                                             <input class="form-control" type="number" id="count" value="0">
                                         </div>
+                                        <% } %>
                                     </div>
                                     <div class="form-group">
                                         <label>课程内容</label>
@@ -92,7 +105,7 @@
             enddate: $("#enddate").val(),
             credits: $("#credits").val(),
             maximum: $("#maximum").val(),
-            count: $("#count").val(),
+            count: $("#count").length ? $("#count").val() : undefined,
             content: $("#content").val()
         }, function (res) {
             if (res.success) {

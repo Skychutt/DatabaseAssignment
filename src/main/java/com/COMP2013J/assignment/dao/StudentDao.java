@@ -60,9 +60,10 @@ public class StudentDao {
             sql += "clazzno = ?,";
             params.add(student.getClazzno());
         }
-        sql = sql.substring(0,sql.length()-1);
-        sql+=" where sno = '" + student.getSno() + "'";
-        res = helper.executeUpdate(sql,params.toArray());
+        sql = sql.substring(0, sql.length() - 1);
+        sql += " where sno = ?";
+        params.add(student.getSno());
+        res = helper.executeUpdate(sql, params.toArray());
         helper.closeDB();
         return res;
     }
@@ -76,23 +77,70 @@ public class StudentDao {
         return res;
     }
 
+    public int countStuCourseBySno(String sno) {
+        JdbcHelper helper = new JdbcHelper();
+        ResultSet resultSet = helper.executeQuery("select count(1) from tb_stu_course where sno = ?", sno);
+        try {
+            if (resultSet != null && resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            helper.closeDB();
+        }
+        return 0;
+    }
 
-    public PagerVO<Student> page(int current, int size, String whereSql){
+    public int countArchiveBySno(String sno) {
+        JdbcHelper helper = new JdbcHelper();
+        ResultSet resultSet = helper.executeQuery("select count(1) from tb_student_archive where sno = ?", sno);
+        try {
+            if (resultSet != null && resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            helper.closeDB();
+        }
+        return 0;
+    }
+
+
+    public int countByClazzno(String clazzno) {
+        JdbcHelper helper = new JdbcHelper();
+        ResultSet resultSet = helper.executeQuery("select count(1) from tb_student where clazzno = ?", clazzno);
+        try {
+            if (resultSet != null && resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            helper.closeDB();
+        }
+        return 0;
+    }
+
+    public PagerVO<Student> page(int current, int size, String whereSql, Object... whereParams) {
         PagerVO<Student> pagerVO = new PagerVO<>();
         pagerVO.setCurrent(current);
         pagerVO.setSize(size);
         JdbcHelper helper = new JdbcHelper();
-        if(whereSql == null){
+        if (whereSql == null) {
             whereSql = " ";
         }
         ResultSet resultSet;
         try {
-            resultSet = helper.executeQuery("select count(1) from tb_student "+whereSql);
+            resultSet = helper.executeQuery("select count(1) from tb_student " + whereSql, whereParams);
             resultSet.next();
             int total = resultSet.getInt(1);
             pagerVO.setTotal(total);
 
-            resultSet = helper.executeQuery("select * from tb_student " + whereSql + " limit " + ((current-1)*size) + "," + size);
+            Object[] listParams = appendLimitParams(whereParams, (current - 1) * size, size);
+            resultSet = helper.executeQuery(
+                    "select * from tb_student " + whereSql + " limit ?, ?", listParams);
             List<Student> list = new ArrayList<>();
             while (resultSet.next()){
                 Student e = toEntity(resultSet);
@@ -126,13 +174,23 @@ public class StudentDao {
      * 获取一个班学生数量
      * @return
      */
-    public int count(String whereSql){
-        if(whereSql == null){
+    private Object[] appendLimitParams(Object[] whereParams, int offset, int limit) {
+        Object[] listParams = new Object[(whereParams == null ? 0 : whereParams.length) + 2];
+        if (whereParams != null) {
+            System.arraycopy(whereParams, 0, listParams, 0, whereParams.length);
+        }
+        listParams[listParams.length - 2] = offset;
+        listParams[listParams.length - 1] = limit;
+        return listParams;
+    }
+
+    public int count(String whereSql, Object... whereParams) {
+        if (whereSql == null) {
             whereSql = "";
         }
 
         JdbcHelper helper = new JdbcHelper();
-        ResultSet resultSet = helper.executeQuery("select count(1) from tb_student" + whereSql);
+        ResultSet resultSet = helper.executeQuery("select count(1) from tb_student" + whereSql, whereParams);
         try {
             resultSet.next();
             return resultSet.getInt(1);

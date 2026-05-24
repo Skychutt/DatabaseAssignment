@@ -6,7 +6,9 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.COMP2013J.assignment.security.CsrfUtil" %>
 <%
+    String csrfToken = CsrfUtil.ensureToken(session);
     String navRole = session.getAttribute("role") == null ? "" : String.valueOf(session.getAttribute("role"));
     boolean navAdmin = "admin".equals(navRole);
     boolean navTeacher = "teacher".equals(navRole);
@@ -47,7 +49,7 @@
                         <% if (navAdmin || navTeacher || navStudent) { %>
                         <li><a href="${pageContext.request.contextPath}/stuCourse"><%= navStudent ? "我的选课" : (navAdmin ? "选课管理" : "选课与打分") %></a></li>
                         <% } %>
-                        <% if (navAdmin || navTeacher || navStudent) { %>
+                        <% if (navAdmin || navTeacher) { %>
                         <li><a href="${pageContext.request.contextPath}/directory">通讯录</a></li>
                         <% } %>
                         <% if (navAdmin || navTeacher || navStudent) { %>
@@ -230,4 +232,6 @@
 
 </header>
 <!--End 头部信息-->
+<meta name="csrf-token" content="<%= csrfToken %>">
+<script type="text/javascript" src="${pageContext.request.contextPath}/assets/js/csrf-ajax.js"></script>
 <jsp:include page="_lang_switcher.jsp"/>

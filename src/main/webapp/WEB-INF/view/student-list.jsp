@@ -100,7 +100,7 @@
                                         <th>性别</th>
                                         <th>年龄</th>
                                         <th>电话</th>
-                                        <% if (canManageStudent) { %><th>密码</th><% } %>
+                                        <% if (canManageStudent) { %><th>密码状态</th><% } %>
                                         <th>入学时间</th>
                                         <th>地址</th>
                                         <th>班级编号</th>
@@ -122,7 +122,7 @@
                                         <td><%= s.getAge() == null ? "" : s.getAge() %></td>
                                         <td><%= s.getTele() == null ? "" : s.getTele() %></td>
                                         <% if (canManageStudent) { %>
-                                        <td><%= s.getPassword() == null ? "" : s.getPassword() %></td>
+                                        <td><%= s.getPassword() == null || s.getPassword().isEmpty() ? "未设置" : "已设置（加密存储）" %></td>
                                         <% } %>
                                         <td><%= s.getEnterdate() == null ? "" : new java.text.SimpleDateFormat("yyyy-MM-dd").format(s.getEnterdate()) %></td>
                                         <td><%= s.getAddress() == null ? "" : s.getAddress() %></td>

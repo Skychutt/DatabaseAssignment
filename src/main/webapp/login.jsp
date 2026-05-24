@@ -69,22 +69,25 @@
             <div class="login-header text-center">
                 <a href="${pageContext.request.contextPath}/"> <img alt="light year admin" src="${pageContext.request.contextPath}/assets/images/img.png"> </a>
             </div>
-            <form action="${pageContext.request.contextPath}/login" method="post">
+            <form id="loginForm" autocomplete="off" onsubmit="return false;">
                 <div class="form-group has-feedback feedback-left">
-                    <input type="text" placeholder="请输入您的用户名" class="form-control" name="username" id="username" />
+                    <input type="text" placeholder="请输入您的用户名" class="form-control" id="username"
+                           autocomplete="off" autocapitalize="off" spellcheck="false" value=""/>
                     <span class="mdi mdi-account form-control-feedback" aria-hidden="true"></span>
                 </div>
                 <div class="form-group has-feedback feedback-left">
-                    <input type="password" placeholder="请输入密码" class="form-control" id="password" name="password" />
+                    <input type="password" placeholder="请输入密码" class="form-control" id="password"
+                           autocomplete="new-password" value=""/>
                     <span class="mdi mdi-lock form-control-feedback" aria-hidden="true"></span>
                 </div>
                 <div class="form-group has-feedback feedback-left row">
                     <div class="col-xs-7">
-                        <input type="text" name="captcha" id="captcha" class="form-control" placeholder="验证码">
+                        <input type="text" id="captcha" class="form-control" placeholder="验证码"
+                               autocomplete="off" autocorrect="off" value=""/>
                         <span class="mdi mdi-check-all form-control-feedback" aria-hidden="true"></span>
                     </div>
                     <div class="col-xs-5">
-                        <img src="${pageContext.request.contextPath}/captcha" class="pull-right" style="cursor: pointer;" onclick="this.src=this.src+'?d='+Math.random();" title="点击刷新" alt="captcha">
+                        <img id="captchaImg" src="${pageContext.request.contextPath}/captcha" class="pull-right" style="cursor: pointer;" onclick="refreshCaptcha()" title="点击刷新" alt="captcha">
                     </div>
                 </div>
                 <div class="form-group" style="text-align: center">
@@ -96,19 +99,25 @@
                 <div class="form-group">
                     <button class="btn btn-block btn-primary" type="button" onclick="login()">立即登录</button>
                 </div>
+            </form>
 
-                <hr/>
+            <hr/>
+            <form id="registerForm" autocomplete="off" onsubmit="return false;">
                 <div class="form-group" style="text-align:center;">
                     <h4 style="margin: 0;">注册用户</h4>
                 </div>
 
-                <div class="form-group has-feedback feedback-left">
-                    <input type="text" placeholder="用户名（管理员）/ 学号（学生）/ 工号（教师）" class="form-control" id="reg_username"/>
+                <div class="form-group" style="text-align:center;">
+                    <small class="text-muted">仅支持学生、教师自助注册；管理员账号由系统维护，不可在此注册。</small>
                 </div>
                 <div class="form-group has-feedback feedback-left">
-                    <input type="password" placeholder="密码" class="form-control" id="reg_password"/>
+                    <input type="text" placeholder="学号（学生）/ 工号（教师）" class="form-control" id="reg_username"
+                           autocomplete="off" value=""/>
                 </div>
-
+                <div class="form-group has-feedback feedback-left">
+                    <input type="password" placeholder="密码" class="form-control" id="reg_password"
+                           autocomplete="new-password" value=""/>
+                </div>
                 <div id="studentRegFields" style="display:none;">
                     <div class="form-group has-feedback feedback-left">
                         <input type="text" placeholder="姓名" class="form-control" id="reg_name"/>
@@ -151,24 +160,50 @@
             $("#studentRegFields").hide();
             $("#teacherRegFields").hide();
         }
+        if (usertype === "admin") {
+            $("#reg_username,#reg_password").prop("disabled", true);
+        } else {
+            $("#reg_username,#reg_password").prop("disabled", false);
+        }
+    }
+
+    function refreshCaptcha() {
+        var img = document.getElementById("captchaImg");
+        img.src = "${pageContext.request.contextPath}/captcha?t=" + Date.now();
+    }
+
+    function clearLoginFields() {
+        $("#username, #password, #captcha").val("").prop("defaultValue", "");
+        $("#reg_username, #reg_password, #reg_name, #reg_clazzno, #reg_teacher_name").val("");
     }
 
     $(function () {
+        clearLoginFields();
+        refreshCaptcha();
         toggleRegisterFields();
         $("input[name=usertype]").change(function () {
             toggleRegisterFields();
         });
+        // 部分浏览器会在页面加载后延迟自动填充，再清一次
+        setTimeout(clearLoginFields, 100);
+        setTimeout(clearLoginFields, 500);
     });
 
     function registerUser() {
         let usertype = $("input[name=usertype]:checked").val();
+        if (usertype === "admin") {
+            alert("不允许自助注册管理员，请联系系统管理员。");
+            return;
+        }
         let username = $("#reg_username").val();
         let password = $("#reg_password").val();
+        let captcha = $("#captcha").val();
 
         let payload = {
             usertype: usertype,
             username: username,
-            password: password
+            password: password,
+            captcha: captcha
         };
 
         if (usertype === "emp") {
@@ -203,7 +238,6 @@
         let password = $("#password").val()
         let captcha = $("#captcha").val()
         let usertype = $("input[name=usertype]:checked").val()
-        console.log(username,password,captcha,usertype)
         $.ajax({
             type: "post",
             url: "${pageContext.request.contextPath}/login",

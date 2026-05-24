@@ -15,9 +15,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * 查看管理员账号与教师名册
- */
 @WebServlet("/directory")
 public class DirectoryServlet extends HttpServlet {
 
@@ -26,8 +23,8 @@ public class DirectoryServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (RoleHelper.role(req.getSession(false)) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+        if (!RoleHelper.isAdmin(req.getSession(false)) && !RoleHelper.isTeacher(req.getSession(false))) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "权限不足");
             return;
         }
         req.setAttribute("adminNames", adminService.listAllUsernames());

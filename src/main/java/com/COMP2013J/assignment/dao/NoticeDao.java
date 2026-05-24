@@ -51,7 +51,7 @@ public class NoticeDao {
         return null;
     }
 
-    public PagerVO<Notice> page(int current, int size, String whereSql) {
+    public PagerVO<Notice> page(int current, int size, String whereSql, Object... whereParams) {
         PagerVO<Notice> pagerVO = new PagerVO<>();
         pagerVO.setCurrent(current);
         pagerVO.setSize(size);
@@ -60,14 +60,15 @@ public class NoticeDao {
             whereSql = " ";
         }
         try {
-            ResultSet resultSet = helper.executeQuery("select count(1) from tb_notice " + whereSql);
+            ResultSet resultSet = helper.executeQuery("select count(1) from tb_notice " + whereSql, whereParams);
             resultSet.next();
             int total = resultSet.getInt(1);
             pagerVO.setTotal(total);
 
+            Object[] listParams = appendLimitParams(whereParams, (current - 1) * size, size);
             resultSet = helper.executeQuery(
-                    "select * from tb_notice " + whereSql + " order by create_time desc, id desc limit "
-                            + ((current - 1) * size) + "," + size);
+                    "select * from tb_notice " + whereSql + " order by create_time desc, id desc limit ?, ?",
+                    listParams);
             List<Notice> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(toEntity(resultSet));
@@ -81,6 +82,16 @@ public class NoticeDao {
             helper.closeDB();
         }
         return pagerVO;
+    }
+
+    private Object[] appendLimitParams(Object[] whereParams, int offset, int limit) {
+        Object[] listParams = new Object[(whereParams == null ? 0 : whereParams.length) + 2];
+        if (whereParams != null) {
+            System.arraycopy(whereParams, 0, listParams, 0, whereParams.length);
+        }
+        listParams[listParams.length - 2] = offset;
+        listParams[listParams.length - 1] = limit;
+        return listParams;
     }
 
     private Notice toEntity(ResultSet rs) throws SQLException {

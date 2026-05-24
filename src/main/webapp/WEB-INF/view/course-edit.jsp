@@ -2,6 +2,7 @@
 <%@ page import="com.COMP2013J.assignment.entity.Course" %>
 <%
     Course course = (Course) request.getAttribute("course");
+    Boolean courseAdminMode = Boolean.TRUE.equals(request.getAttribute("courseAdminMode"));
     java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");
 %>
 <!DOCTYPE html>
@@ -34,7 +35,7 @@
                                         </div>
                                         <div class="col-md-4 form-group">
                                             <label>教师工号</label>
-                                            <input class="form-control" type="text" id="tno" value="<%= course == null || course.getTno() == null ? "" : course.getTno() %>">
+                                            <input class="form-control" type="text" id="tno" value="<%= course == null || course.getTno() == null ? "" : course.getTno() %>" <%= courseAdminMode ? "" : "readonly" %>>
                                         </div>
                                         <div class="col-md-4 form-group">
                                             <label>课程名</label>
@@ -60,10 +61,17 @@
                                             <label>人数上限</label>
                                             <input class="form-control" type="number" id="maximum" value="<%= course == null || course.getMaximum() == null ? "" : course.getMaximum() %>">
                                         </div>
+                                        <% if (courseAdminMode) { %>
                                         <div class="col-md-4 form-group">
                                             <label>已选人数</label>
                                             <input class="form-control" type="number" id="count" value="<%= course == null || course.getCount() == null ? "" : course.getCount() %>">
                                         </div>
+                                        <% } else { %>
+                                        <div class="col-md-4 form-group">
+                                            <label>已选人数</label>
+                                            <input class="form-control" type="text" readonly value="<%= course == null || course.getCount() == null ? "0" : course.getCount() %>（系统维护）">
+                                        </div>
+                                        <% } %>
                                     </div>
                                     <div class="form-group">
                                         <label>课程内容</label>
@@ -97,7 +105,7 @@
             enddate: $("#enddate").val(),
             credits: $("#credits").val(),
             maximum: $("#maximum").val(),
-            count: $("#count").val(),
+            count: $("#count").length ? $("#count").val() : undefined,
             content: $("#content").val()
         }, function (res) {
             if (res.success) {

@@ -69,12 +69,29 @@ mysqldump -u root -p --default-character-set=utf8mb4 stu_manage > sql/stu_manage
 
 ## 二、修改本地数据库连接配置
 
-找到 `src/main/java/com/COMP2013J/assignment/utils/JdbcHelper.java`，修改数据库账号密码：
+复制示例配置并填写本机 MySQL 账号密码（**勿将含真实密码的 `jdbc.properties` 提交到 Git**）：
 
+```bash
+cp src/main/resources/jdbc.properties.example src/main/resources/jdbc.properties
 ```
-private static final String user = "root";
-private static final String pass = "你mysql数据库的密码"; // 自行修改
+
+编辑 `src/main/resources/jdbc.properties`：
+
+```properties
+jdbc.url=jdbc:mysql://localhost:3306/stu_manage?serverTimezone=GMT%2B8&characterEncoding=utf-8&allowPublicKeyRetrieval=true&useSSL=false
+jdbc.user=root
+jdbc.password=你的MySQL密码
 ```
+
+`JdbcHelper` 从 classpath 读取上述配置，源码中不再硬编码密码。
+
+### 密码与安全说明
+
+- 用户密码使用 **BCrypt** 哈希存储（依赖 `jbcrypt`）。
+- 若导入的测试数据仍为明文，**首次登录成功后会自动升级为哈希**。
+- 登录、注册需填写验证码；注册**不允许**自助创建管理员。
+- 登录后的 POST 请求携带 CSRF 令牌（`AuthFilter` + `csrf-ajax.js`）。
+- 业务 SQL 使用 `PreparedStatement` 参数化，避免拼接注入。
 
 ---
 

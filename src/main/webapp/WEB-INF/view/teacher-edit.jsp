@@ -33,7 +33,7 @@
                                         </div>
                                         <div class="col-md-6 form-group">
                                             <label>密码</label>
-                                            <input class="form-control" type="text" id="password" value="<%= teacher == null || teacher.getPassword() == null ? "" : teacher.getPassword() %>">
+                                            <input class="form-control" type="password" id="password" value="" placeholder="留空则不修改密码">
                                         </div>
                                     </div>
                                     <div class="form-group">

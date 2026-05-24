@@ -77,7 +77,7 @@
                                         <th>#</th>
                                         <th>工号</th>
                                         <th>姓名</th>
-                                        <th><%= canManageTeacher ? "密码" : "密码（隐藏）" %></th>
+                                        <th><%= canManageTeacher ? "密码状态" : "密码（隐藏）" %></th>
                                         <% if (canManageTeacher) { %><th>操作</th><% } %>
                                     </tr>
                                     </thead>
@@ -91,7 +91,7 @@
                                         <th scope="row"><%= (pagerVO.getCurrent() - 1) * pagerVO.getSize() + idx + 1 %></th>
                                         <td><%= t.getTno() %></td>
                                         <td><%= t.getTname() == null ? "" : t.getTname() %></td>
-                                        <td><%= canManageTeacher ? (t.getPassword() == null ? "" : t.getPassword()) : "—" %></td>
+                                        <td><%= canManageTeacher ? (t.getPassword() == null || t.getPassword().isEmpty() ? "未设置" : "已设置（加密存储）") : "—" %></td>
                                         <% if (canManageTeacher) { %>
                                         <td>
                                             <button type="button" class="btn btn-xs btn-primary" onclick="editTeacher('<%= t.getTno() %>')">修改</button>

@@ -5,6 +5,8 @@ import com.COMP2013J.assignment.entity.Notice;
 import com.COMP2013J.assignment.utils.vo.PagerVO;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NoticeService {
 
@@ -15,14 +17,17 @@ public class NoticeService {
     }
 
     public PagerVO<Notice> page(int current, int size, String publisher, String keyword) {
-        String whereSql = " where 1=1 ";
+        StringBuilder whereSql = new StringBuilder(" where 1=1 ");
+        List<Object> params = new ArrayList<>();
         if (hasText(publisher)) {
-            whereSql += " and publisher = '" + publisher.trim().replace("'", "''") + "'";
+            whereSql.append(" and publisher = ?");
+            params.add(publisher.trim());
         }
         if (hasText(keyword)) {
-            whereSql += " and content like '%" + keyword.trim().replace("'", "''") + "%'";
+            whereSql.append(" and content like ?");
+            params.add("%" + keyword.trim() + "%");
         }
-        return dao.page(current, size, whereSql);
+        return dao.page(current, size, whereSql.toString(), params.toArray());
     }
 
     public String insert(Notice notice) {
@@ -42,20 +47,12 @@ public class NoticeService {
     }
 
     public String update(Notice notice) {
-        if (notice.getId() == null) {
+        if (notice.getId() == null || notice.getId() <= 0) {
             return "公告编号无效";
         }
         if (!hasText(notice.getContent())) {
             return "公告内容不能为空";
         }
-        Notice existing = dao.getById(notice.getId());
-        if (existing == null) {
-            return "公告不存在";
-        }
-        if (notice.getCreateTime() == null) {
-            notice.setCreateTime(existing.getCreateTime());
-        }
-        notice.setPublisher(existing.getPublisher());
         if (dao.update(notice) <= 0) {
             return "保存失败";
         }
@@ -65,9 +62,6 @@ public class NoticeService {
     public String delete(long id) {
         if (id <= 0) {
             return "公告编号无效";
-        }
-        if (dao.getById(id) == null) {
-            return "公告不存在";
         }
         if (dao.delete(id) <= 0) {
             return "删除失败";

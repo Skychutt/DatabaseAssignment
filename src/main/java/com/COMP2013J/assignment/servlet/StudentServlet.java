@@ -74,7 +74,7 @@ public class StudentServlet extends HttpServlet {
             pagerVO.setSize(size);
             pagerVO.setTotal(0);
             pagerVO.setList(new ArrayList<>());
-            req.setAttribute("errorMsg", "学生数据加载异常：" + e.getMessage());
+            req.setAttribute("errorMsg", "学生数据加载异常，请稍后重试。");
         }
         pagerVO.init();
 
@@ -143,8 +143,12 @@ public class StudentServlet extends HttpServlet {
 
         if ("del".equals(r)) {
             String sno = req.getParameter("sno");
-            studentService.delete(sno);
-            resp.getWriter().write(ApiResult.json(true, "删除成功"));
+            String msg = studentService.deleteWithCheck(sno);
+            if (msg != null) {
+                resp.getWriter().write(ApiResult.json(false, msg));
+            } else {
+                resp.getWriter().write(ApiResult.json(true, "删除成功"));
+            }
             return;
         }
 

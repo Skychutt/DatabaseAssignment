@@ -1,6 +1,8 @@
 package com.COMP2013J.assignment.servlet;
 
 import com.COMP2013J.assignment.entity.Course;
+import com.COMP2013J.assignment.entity.Teacher;
+import com.COMP2013J.assignment.security.CourseAccessHelper;
 import com.COMP2013J.assignment.security.RoleHelper;
 import com.COMP2013J.assignment.service.CourseService;
 import com.COMP2013J.assignment.utils.ApiResult;
@@ -27,23 +29,25 @@ public class CourseServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         String r = req.getParameter("r");
         if ("add".equals(r) || "edit".equals(r)) {
-            if (!RoleHelper.isAdmin(session) && !RoleHelper.isTeacher(session)) {
+            if (!CourseAccessHelper.canManageCourse(session)) {
                 resp.sendRedirect(req.getContextPath() + "/course");
                 return;
             }
         }
         if ("add".equals(r)) {
+            req.setAttribute("courseAdminMode", RoleHelper.isAdmin(session));
             req.getRequestDispatcher("/WEB-INF/view/course-add.jsp").forward(req, resp);
             return;
         }
         if ("edit".equals(r)) {
             String cno = req.getParameter("cno");
             Course course = courseService.getByCno(cno);
-            if (course == null) {
+            if (course == null || !CourseAccessHelper.isCourseOwner(session, course)) {
                 resp.sendRedirect(req.getContextPath() + "/course");
                 return;
             }
             req.setAttribute("course", course);
+            req.setAttribute("courseAdminMode", RoleHelper.isAdmin(session));
             req.getRequestDispatcher("/WEB-INF/view/course-edit.jsp").forward(req, resp);
             return;
         }
@@ -71,7 +75,7 @@ public class CourseServlet extends HttpServlet {
             pagerVO.setSize(size);
             pagerVO.setTotal(0);
             pagerVO.setList(new ArrayList<>());
-            req.setAttribute("errorMsg", "课程数据加载异常：" + e.getMessage());
+            req.setAttribute("errorMsg", "课程数据加载异常，请稍后重试。");
         }
         pagerVO.init();
 
@@ -80,7 +84,7 @@ public class CourseServlet extends HttpServlet {
         req.setAttribute("tno", tno);
         req.setAttribute("size", pagerVO.getSize());
         req.setAttribute("pagerVO", pagerVO);
-        req.setAttribute("canManageCourse", RoleHelper.isAdmin(session) || RoleHelper.isTeacher(session));
+        req.setAttribute("canManageCourse", CourseAccessHelper.canManageCourse(session));
         req.getRequestDispatcher("/WEB-INF/view/course-list.jsp").forward(req, resp);
     }
 
@@ -89,10 +93,13 @@ public class CourseServlet extends HttpServlet {
         req.setCharacterEncoding("utf-8");
         resp.setContentType("application/json; charset=utf-8");
         HttpSession session = req.getSession(false);
-        if (!RoleHelper.isAdmin(session) && !RoleHelper.isTeacher(session)) {
+        if (!CourseAccessHelper.canManageCourse(session)) {
             resp.getWriter().write(ApiResult.json(false, "权限不足"));
             return;
         }
+
+        boolean adminOperator = RoleHelper.isAdmin(session);
+        String operatorTno = resolveOperatorTno(session);
         String r = req.getParameter("r");
 
         if ("add".equals(r) || "edit".equals(r)) {
@@ -141,21 +148,23 @@ public class CourseServlet extends HttpServlet {
                 }
             }
 
-            String countStr = req.getParameter("count");
-            if (countStr != null && !countStr.trim().isEmpty()) {
-                try {
-                    course.setCount(Integer.parseInt(countStr.trim()));
-                } catch (NumberFormatException e) {
-                    resp.getWriter().write(ApiResult.json(false, "已选人数格式错误"));
-                    return;
+            if (adminOperator) {
+                String countStr = req.getParameter("count");
+                if (countStr != null && !countStr.trim().isEmpty()) {
+                    try {
+                        course.setCount(Integer.parseInt(countStr.trim()));
+                    } catch (NumberFormatException e) {
+                        resp.getWriter().write(ApiResult.json(false, "已选人数格式错误"));
+                        return;
+                    }
                 }
             }
 
             String msg;
             if ("add".equals(r)) {
-                msg = courseService.insert(course);
+                msg = courseService.insert(course, adminOperator, operatorTno);
             } else {
-                msg = courseService.update(course);
+                msg = courseService.update(course, adminOperator, operatorTno);
             }
             if (msg != null) {
                 resp.getWriter().write(ApiResult.json(false, msg));
@@ -167,7 +176,7 @@ public class CourseServlet extends HttpServlet {
 
         if ("del".equals(r)) {
             String cno = req.getParameter("cno");
-            String msg = courseService.deleteWithCheck(cno);
+            String msg = courseService.deleteWithCheck(cno, adminOperator, operatorTno);
             if (msg != null) {
                 resp.getWriter().write(ApiResult.json(false, msg));
             } else {
@@ -177,6 +186,17 @@ public class CourseServlet extends HttpServlet {
         }
 
         resp.getWriter().write(ApiResult.json(false, "未知请求"));
+    }
+
+    private String resolveOperatorTno(HttpSession session) {
+        if (!RoleHelper.isTeacher(session)) {
+            return null;
+        }
+        Object user = session.getAttribute("user");
+        if (user instanceof Teacher) {
+            return ((Teacher) user).getTno();
+        }
+        return null;
     }
 
     private int parsePositiveInt(String value, int defaultValue) {

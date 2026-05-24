@@ -3,6 +3,7 @@ package com.COMP2013J.assignment.servlet;
 import com.COMP2013J.assignment.entity.Admin;
 import com.COMP2013J.assignment.entity.Student;
 import com.COMP2013J.assignment.entity.Teacher;
+import com.COMP2013J.assignment.security.PasswordUtil;
 import com.COMP2013J.assignment.service.AdminService;
 import com.COMP2013J.assignment.service.StudentService;
 import com.COMP2013J.assignment.service.TeacherService;
@@ -51,6 +52,10 @@ public class EditPasswordServlet extends HttpServlet {
             resp.getWriter().write(ApiResult.json(false, "新密码不可为空"));
             return;
         }
+        if (newPassword.trim().length() < 6) {
+            resp.getWriter().write(ApiResult.json(false, "新密码长度至少 6 位"));
+            return;
+        }
 
         if ("student".equals(role)) {
             Object obj = session.getAttribute("user");
@@ -60,7 +65,7 @@ public class EditPasswordServlet extends HttpServlet {
             }
 
             Student current = (Student) obj;
-            if (oldPassword == null || !oldPassword.equals(current.getPassword())) {
+            if (!PasswordUtil.matches(oldPassword, current.getPassword())) {
                 resp.getWriter().write(ApiResult.json(false, "旧密码错误"));
                 return;
             }
@@ -74,7 +79,7 @@ public class EditPasswordServlet extends HttpServlet {
                 return;
             }
 
-            current.setPassword(newPassword.trim());
+            current.setPassword(PasswordUtil.hash(newPassword.trim()));
             session.setAttribute("user", current);
             resp.getWriter().write(ApiResult.json(true, "修改成功"));
             return;
@@ -87,7 +92,7 @@ public class EditPasswordServlet extends HttpServlet {
                 return;
             }
             Admin current = (Admin) obj;
-            if (oldPassword == null || !oldPassword.equals(current.getPassword())) {
+            if (!PasswordUtil.matches(oldPassword, current.getPassword())) {
                 resp.getWriter().write(ApiResult.json(false, "旧密码错误"));
                 return;
             }
@@ -97,7 +102,7 @@ public class EditPasswordServlet extends HttpServlet {
                 resp.getWriter().write(ApiResult.json(false, msg));
                 return;
             }
-            current.setPassword(newPassword.trim());
+            current.setPassword(PasswordUtil.hash(newPassword.trim()));
             session.setAttribute("user", current);
             resp.getWriter().write(ApiResult.json(true, "修改成功"));
             return;
@@ -111,7 +116,7 @@ public class EditPasswordServlet extends HttpServlet {
             }
 
             Teacher current = (Teacher) obj;
-            if (oldPassword == null || !oldPassword.equals(current.getPassword())) {
+            if (!PasswordUtil.matches(oldPassword, current.getPassword())) {
                 resp.getWriter().write(ApiResult.json(false, "旧密码错误"));
                 return;
             }
@@ -125,7 +130,7 @@ public class EditPasswordServlet extends HttpServlet {
                 return;
             }
 
-            current.setPassword(newPassword.trim());
+            current.setPassword(PasswordUtil.hash(newPassword.trim()));
             session.setAttribute("user", current);
             resp.getWriter().write(ApiResult.json(true, "修改成功"));
             return;
@@ -134,4 +139,3 @@ public class EditPasswordServlet extends HttpServlet {
         resp.getWriter().write(ApiResult.json(false, "未知角色"));
     }
 }
-
