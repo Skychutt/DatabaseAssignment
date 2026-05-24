@@ -9,12 +9,21 @@
     <link href="${pageContext.request.contextPath}/assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/assets/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/assets/css/style.min.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/assets/css/home-carousel.css" rel="stylesheet">
 </head>
 
 <body>
 <%
     String idxRole = session.getAttribute("role") == null ? "" : String.valueOf(session.getAttribute("role"));
     String idxCp = request.getContextPath();
+
+    String[][] homeSlides = new String[][]{
+            {idxCp + "/assets/images/carousel/01.jpg", ""},
+            {idxCp + "/assets/images/carousel/02.jpg", ""},
+            {idxCp + "/assets/images/carousel/03.jpg", ""},
+
+
+    };
 %>
 <div class="lyear-layout-web">
     <div class="lyear-layout-container">
@@ -24,6 +33,52 @@
         <main class="lyear-layout-content">
 
             <div class="container-fluid">
+
+                <% if (homeSlides != null && homeSlides.length > 0) { %>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header"><h4>图片展示</h4></div>
+                            <div class="card-body" style="padding: 0;">
+                                <div id="homeCarousel" class="carousel slide" data-ride="carousel" data-interval="5000">
+                                    <% if (homeSlides.length > 1) { %>
+                                    <ol class="carousel-indicators">
+                                        <% for (int si = 0; si < homeSlides.length; si++) { %>
+                                        <li data-target="#homeCarousel" data-slide-to="<%= si %>"<%= si == 0 ? " class=\"active\"" : "" %>></li>
+                                        <% } %>
+                                    </ol>
+                                    <% } %>
+                                    <div class="carousel-inner" role="listbox">
+                                        <% for (int si = 0; si < homeSlides.length; si++) {
+                                            String slideSrc = homeSlides[si][0];
+                                            String slideCap = homeSlides[si].length > 1 ? homeSlides[si][1] : "";
+                                        %>
+                                        <div class="item<%= si == 0 ? " active" : "" %>">
+                                            <img src="<%= slideSrc %>" alt="slide-<%= si + 1 %>">
+                                            <% if (slideCap != null && !slideCap.trim().isEmpty()) { %>
+                                            <div class="carousel-caption">
+                                                <p><%= slideCap %></p>
+                                            </div>
+                                            <% } %>
+                                        </div>
+                                        <% } %>
+                                    </div>
+                                    <% if (homeSlides.length > 1) { %>
+                                    <a class="left carousel-control" href="#homeCarousel" role="button" data-slide="prev">
+                                        <span class="mdi mdi-chevron-left" aria-hidden="true"></span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                    <a class="right carousel-control" href="#homeCarousel" role="button" data-slide="next">
+                                        <span class="mdi mdi-chevron-right" aria-hidden="true"></span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
 
                 <div class="row">
                     <div class="col-sm-6 col-lg-3">

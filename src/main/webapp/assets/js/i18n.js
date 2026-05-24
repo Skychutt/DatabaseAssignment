@@ -54,6 +54,7 @@
         "退选失败": "Drop failed",
         "已保存": "Saved",
         "后台首页": "Dashboard",
+        "图片展示": "Gallery",
         "功能": "Menu",
         "班级信息": "Classes",
         "学生信息": "Students",

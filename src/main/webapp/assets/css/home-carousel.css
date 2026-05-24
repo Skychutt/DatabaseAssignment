@@ -1,0 +1,59 @@
+/* 首页图片轮播 */
+#homeCarousel {
+    border-radius: 4px;
+    overflow: hidden;
+    background: #eceff1;
+}
+
+#homeCarousel .carousel-inner {
+    max-height: 360px;
+}
+
+#homeCarousel .carousel-inner > .item {
+    height: 360px;
+    text-align: center;
+    background: #cfd8dc;
+}
+
+#homeCarousel .carousel-inner > .item > img {
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    display: block;
+}
+
+#homeCarousel .carousel-caption {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px 16px 28px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+}
+
+#homeCarousel .carousel-control {
+    width: 8%;
+    background-image: none;
+    opacity: 0.85;
+}
+
+#homeCarousel .carousel-control .mdi {
+    font-size: 42px;
+    line-height: 360px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+#homeCarousel .carousel-indicators {
+    bottom: 8px;
+}
+
+@media (max-width: 768px) {
+    #homeCarousel .carousel-inner,
+    #homeCarousel .carousel-inner > .item,
+    #homeCarousel .carousel-inner > .item > img {
+        height: 220px;
+    }
+    #homeCarousel .carousel-control .mdi {
+        line-height: 220px;
+        font-size: 32px;
+    }
+}
