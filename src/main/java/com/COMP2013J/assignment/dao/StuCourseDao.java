@@ -51,9 +51,11 @@ public class StuCourseDao {
     }
 
     public List<StuCourseView> listByStudent(String sno) {
-        String sql = "select sc.cno, sc.sno, sc.chosetime, sc.score, sc.evaluation, c.cname, s.name as stu_name "
+        String sql = "select sc.cno, sc.sno, sc.chosetime, sc.score, sc.evaluation, c.cname, c.tno as teacher_tno, "
+                + "t.tname as teacher_name, s.name as stu_name "
                 + "from tb_stu_course sc "
                 + "inner join tb_course c on sc.cno = c.cno "
+                + "left join tb_teacher t on c.tno = t.tno "
                 + "left join tb_student s on sc.sno = s.sno "
                 + "where sc.sno = ? order by sc.chosetime desc, sc.cno";
         return queryViewList(sql, sno);
@@ -118,6 +120,12 @@ public class StuCourseDao {
         double sc = rs.getDouble("score");
         v.setScore(rs.wasNull() ? null : sc);
         v.setEvaluation(rs.getString("evaluation"));
+        try {
+            v.setTeacherTno(rs.getString("teacher_tno"));
+            v.setTeacherName(rs.getString("teacher_name"));
+        } catch (SQLException ignored) {
+            // 非学生选课列表查询无教师列
+        }
         return v;
     }
 }

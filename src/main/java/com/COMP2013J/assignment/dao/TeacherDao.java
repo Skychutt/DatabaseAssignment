@@ -165,5 +165,36 @@ public class TeacherDao {
         return null;
     }
 
+    /**
+     * 学生可见的教师公开信息：工号、姓名、开设课程数与课程名摘要（不含密码）。
+     */
+    public List<com.COMP2013J.assignment.entity.TeacherPublicProfile> listPublicProfiles() {
+        List<com.COMP2013J.assignment.entity.TeacherPublicProfile> list = new ArrayList<>();
+        JdbcHelper helper = new JdbcHelper();
+        String sql = "select t.tno, t.tname, count(c.cno) as course_count, "
+                + "group_concat(c.cname order by c.cno separator '、') as course_names "
+                + "from tb_teacher t "
+                + "left join tb_course c on c.tno = t.tno "
+                + "group by t.tno, t.tname "
+                + "order by t.tno";
+        try {
+            ResultSet rs = helper.executeQuery(sql);
+            while (rs != null && rs.next()) {
+                com.COMP2013J.assignment.entity.TeacherPublicProfile p =
+                        new com.COMP2013J.assignment.entity.TeacherPublicProfile();
+                p.setTno(rs.getString("tno"));
+                p.setTname(rs.getString("tname"));
+                p.setCourseCount(rs.getInt("course_count"));
+                p.setCourseNames(rs.getString("course_names"));
+                list.add(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            helper.closeDB();
+        }
+        return list;
+    }
+
 }
 

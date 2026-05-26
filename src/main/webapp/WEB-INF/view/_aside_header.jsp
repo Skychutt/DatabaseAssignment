@@ -45,6 +45,7 @@
                         <% if (navStudent) { %>
                         <li><a href="${pageContext.request.contextPath}/course">课程浏览</a></li>
                         <li><a href="${pageContext.request.contextPath}/studentArchive">个人档案</a></li>
+                        <li><a href="${pageContext.request.contextPath}/teacherDirectory">教师通讯录</a></li>
                         <% } %>
                         <% if (navAdmin || navTeacher || navStudent) { %>
                         <li><a href="${pageContext.request.contextPath}/stuCourse"><%= navStudent ? "我的选课" : (navAdmin ? "选课管理" : "选课与打分") %></a></li>

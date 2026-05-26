@@ -14,6 +14,24 @@ public class StuCourseView {
     private Date chosetime;
     private Double score;
     private String evaluation;
+    private String teacherTno;
+    private String teacherName;
+
+    public String getTeacherTno() {
+        return teacherTno;
+    }
+
+    public void setTeacherTno(String teacherTno) {
+        this.teacherTno = teacherTno;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
+    }
 
     public String getCno() {
         return cno;

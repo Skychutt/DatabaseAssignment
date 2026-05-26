@@ -5,6 +5,7 @@ import com.COMP2013J.assignment.entity.Student;
 import com.COMP2013J.assignment.entity.Teacher;
 import com.COMP2013J.assignment.security.RoleHelper;
 import com.COMP2013J.assignment.service.StuCourseService;
+import com.COMP2013J.assignment.service.TeacherService;
 import com.COMP2013J.assignment.utils.ApiResult;
 import com.COMP2013J.assignment.utils.vo.PagerVO;
 import jakarta.servlet.ServletException;
@@ -20,6 +21,7 @@ import java.io.IOException;
 public class StuCourseServlet extends HttpServlet {
 
     private final StuCourseService stuCourseService = new StuCourseService();
+    private final TeacherService teacherService = new TeacherService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -44,6 +46,7 @@ public class StuCourseServlet extends HttpServlet {
                 avail.init();
             }
             req.setAttribute("availPager", avail);
+            req.setAttribute("teacherNameMap", teacherService.getTnoNameMap());
             req.getRequestDispatcher("/WEB-INF/view/stu-course-student.jsp").forward(req, resp);
             return;
         }

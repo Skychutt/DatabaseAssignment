@@ -3,11 +3,14 @@ package com.COMP2013J.assignment.service;
 import com.COMP2013J.assignment.dao.CourseDao;
 import com.COMP2013J.assignment.dao.TeacherDao;
 import com.COMP2013J.assignment.entity.Teacher;
+import com.COMP2013J.assignment.entity.TeacherPublicProfile;
 import com.COMP2013J.assignment.security.PasswordUtil;
 import com.COMP2013J.assignment.utils.vo.PagerVO;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TeacherService {
 
@@ -81,5 +84,21 @@ public class TeacherService {
         }
         dao.delete(tno.trim());
         return null;
+    }
+
+    /** 供学生查看的公开教师名录（不含密码） */
+    public List<TeacherPublicProfile> listPublicProfiles() {
+        return dao.listPublicProfiles();
+    }
+
+    /** 工号 → 姓名，便于课程列表展示任课教师 */
+    public Map<String, String> getTnoNameMap() {
+        Map<String, String> map = new HashMap<>();
+        for (TeacherPublicProfile p : listPublicProfiles()) {
+            if (p.getTno() != null) {
+                map.put(p.getTno(), p.getTname() == null ? "" : p.getTname());
+            }
+        }
+        return map;
     }
 }

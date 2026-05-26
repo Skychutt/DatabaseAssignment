@@ -38,7 +38,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card">
-                            <div class="card-header"><h4>图片展示</h4></div>
+                            <div class="card-header"><h4>课程展示</h4></div>
                             <div class="card-body" style="padding: 0;">
                                 <div id="homeCarousel" class="carousel slide" data-ride="carousel" data-interval="5000">
                                     <% if (homeSlides.length > 1) { %>

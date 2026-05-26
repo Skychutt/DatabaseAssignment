@@ -3,6 +3,7 @@
 <%@ page import="com.COMP2013J.assignment.entity.Course" %>
 <%@ page import="com.COMP2013J.assignment.utils.vo.PagerVO" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -23,6 +24,7 @@
                 <%
                     List<StuCourseView> myRows = (List<StuCourseView>) request.getAttribute("myRows");
                     PagerVO<Course> availPager = (PagerVO<Course>) request.getAttribute("availPager");
+                    Map<String, String> teacherNameMap = (Map<String, String>) request.getAttribute("teacherNameMap");
                     java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");
                 %>
                 <div class="row">
@@ -36,6 +38,7 @@
                                     <tr>
                                         <th>课程号</th>
                                         <th>课程名</th>
+                                        <th>任课教师</th>
                                         <th>选课时间</th>
                                         <th>成绩</th>
                                         <th>评价</th>
@@ -44,11 +47,22 @@
                                     </thead>
                                     <tbody>
                                     <% if (myRows == null || myRows.isEmpty()) { %>
-                                    <tr><td colspan="6" class="text-center text-muted">暂无已选课程，请在下方选择课程。</td></tr>
+                                    <tr><td colspan="7" class="text-center text-muted">暂无已选课程，请在下方选择课程。</td></tr>
                                     <% } else { for (StuCourseView v : myRows) { %>
                                     <tr>
                                         <td><%= v.getCno() %></td>
                                         <td><%= v.getCname() == null ? "" : v.getCname() %></td>
+                                        <td><%
+                                            String tName = v.getTeacherName();
+                                            String tNo = v.getTeacherTno();
+                                            if (tName != null && !tName.isEmpty()) {
+                                                out.print(tName + (tNo != null && !tNo.isEmpty() ? "（" + tNo + "）" : ""));
+                                            } else if (tNo != null && !tNo.isEmpty()) {
+                                                out.print(tNo);
+                                            } else {
+                                                out.print("—");
+                                            }
+                                        %></td>
                                         <td><%= v.getChosetime() == null ? "" : df.format(v.getChosetime()) %></td>
                                         <td><%= v.getScore() == null ? "" : v.getScore() %></td>
                                         <td><%= v.getEvaluation() == null ? "" : v.getEvaluation() %></td>
@@ -86,7 +100,7 @@
                                     <tr>
                                         <th>课程号</th>
                                         <th>课程名</th>
-                                        <th>教师工号</th>
+                                        <th>任课教师</th>
                                         <th>选课起止</th>
                                         <th>已选/上限</th>
                                         <th>操作</th>
@@ -101,11 +115,21 @@
                                     <%
                                         } else {
                                             for (Course c : alist) {
+                                                String tno = c.getTno();
+                                                String tname = teacherNameMap != null && tno != null ? teacherNameMap.get(tno) : null;
                                     %>
                                     <tr>
                                         <td><%= c.getCno() %></td>
                                         <td><%= c.getCname() == null ? "" : c.getCname() %></td>
-                                        <td><%= c.getTno() == null ? "" : c.getTno() %></td>
+                                        <td><%
+                                            if (tname != null && !tname.isEmpty()) {
+                                                out.print(tname + (tno != null && !tno.isEmpty() ? "（" + tno + "）" : ""));
+                                            } else if (tno != null && !tno.isEmpty()) {
+                                                out.print(tno);
+                                            } else {
+                                                out.print("—");
+                                            }
+                                        %></td>
                                         <td><%= c.getBegindate() == null ? "" : df.format(c.getBegindate()) %> ~ <%= c.getEnddate() == null ? "" : df.format(c.getEnddate()) %></td>
                                         <td><%= c.getCount() == null ? 0 : c.getCount() %> / <%= c.getMaximum() == null ? "不限" : c.getMaximum() %></td>
                                         <td>

@@ -1,21 +1,10 @@
 # stu_manage 概念 ER / EER 图
 
-依据 **COMP2013J** 课件：
-
 - Lecture 8 — Chen ER（实体矩形、属性椭圆、联系菱形、基数、双线/部分参与）
 - Lecture 9 — EER（不相交特化 `d`、ISA 三角、子类继承）
 - Lecture 10 — 概念模型到关系模式的映射说明
 
 数据内容与 `stu_manage.png` / `sql/...-dump.sql` 中 **8 张表** 一致。
-
-## 文件
-
-| 文件 | 说明 |
-|------|------|
-| `ER_Diagram.png` / `.svg` | **概念 ER 图**（Chen 记法） |
-| `EER_Diagram.png` / `.svg` | **EER 图**（含 USER 超类与 ADMIN / TEACHER / STUDENT 子类） |
-| `stu_manage.png` | 逻辑层表结构参考图（Navicat 风格） |
-| `generate_diagrams.py` | 重新生成：`python generate_diagrams.py` |
 
 ## 实体与属性（与表对应）
 
@@ -29,8 +18,6 @@
 | NOTICE | tb_notice | id |
 | STUDENT_ARCHIVE | tb_student_archive | archive_id |
 | （联系）Enrolls | tb_stu_course | (cno, sno) |
-
-`tb_stu_course` 在概念层建模为 **Enrolls** 联系及其属性 `chosetime`、`score`、`evaluation`（Lecture 8：联系可有属性；Lecture 10 步骤 5 映射为独立关系表）。
 
 ## 联系与参与（ER 图）
 
@@ -49,7 +36,7 @@
 - 双线：每个 USER 必须且仅能属于一个子类（与系统角色一致）
 - 子类各自保留特有属性；仅 **STUDENT** 参与 Belongs to、Enrolls、Has Archive；**TEACHER** 参与 Teaches；**ADMIN** 参与 Publishes
 
-## 映射到逻辑模式（Lecture 10）
+## 映射到逻辑模式
 
 见 ER 图左下角黄框：
 

@@ -54,7 +54,7 @@
         "退选失败": "Drop failed",
         "已保存": "Saved",
         "后台首页": "Dashboard",
-        "图片展示": "Gallery",
+        "课程展示": "Course presentation",
         "功能": "Menu",
         "班级信息": "Classes",
         "学生信息": "Students",
@@ -285,7 +285,13 @@
         "确定删除": "Confirm delete",
         "移除选课": "Remove enrollment",
         "保存成绩": "Save grade",
-        "移除": "Remove"
+        "移除": "Remove",
+        "任课教师": "Instructor",
+        "开设课程数": "Courses taught",
+        "开设课程": "Courses offered",
+        "以下为可公开的教师信息，便于了解任课教师。密码等敏感信息不会展示。": "Public teacher information. Passwords are not shown.",
+        "暂无教师信息。": "No teachers found.",
+        "暂无课程": "No courses"
     };
 
     var TITLE_MAP = {
@@ -293,6 +299,7 @@
         "学生信息": "Students",
         "登录页面 - 楚天泽的班级管理系统": "Login",
         "我的选课": "My enrollment",
+        "教师通讯录": "Teacher directory",
         "个人信息": "Profile",
         "修改个人档案": "Edit archive",
         "填写个人档案": "Create archive",
