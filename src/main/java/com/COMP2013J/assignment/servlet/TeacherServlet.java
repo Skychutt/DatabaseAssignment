@@ -97,7 +97,9 @@ public class TeacherServlet extends HttpServlet {
         if ("add".equals(r) || "edit".equals(r)) {
             Teacher teacher = new Teacher();
             teacher.setTno(req.getParameter("tno"));
-            teacher.setPassword(req.getParameter("password"));
+            if ("add".equals(r)) {
+                teacher.setPassword(req.getParameter("password"));
+            }
             teacher.setTname(req.getParameter("tname"));
 
             String msg;

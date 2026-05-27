@@ -87,7 +87,7 @@
                         <span class="mdi mdi-check-all form-control-feedback" aria-hidden="true"></span>
                     </div>
                     <div class="col-xs-5">
-                        <img id="captchaImg" src="${pageContext.request.contextPath}/captcha" class="pull-right" style="cursor: pointer;" onclick="refreshCaptcha()" title="点击刷新" alt="captcha">
+                        <img id="captchaImg" alt="captcha" class="pull-right" style="cursor: pointer; width: 120px; height: 38px; background: #f5f5f5;" onclick="refreshCaptcha()" title="点击刷新">
                     </div>
                 </div>
                 <div class="form-group" style="text-align: center">
@@ -169,7 +169,15 @@
 
     function refreshCaptcha() {
         var img = document.getElementById("captchaImg");
+        if (!img) {
+            return;
+        }
         img.src = "${pageContext.request.contextPath}/captcha?t=" + Date.now();
+    }
+
+    function onAuthFailure() {
+        refreshCaptcha();
+        $("#captcha").val("");
     }
 
     function clearLoginFields() {
@@ -225,10 +233,12 @@
                     location.href = "${pageContext.request.contextPath}/login.jsp";
                 } else {
                     alert(data.message);
+                    onAuthFailure();
                 }
             },
             error: function () {
                 alert("请求服务器失败");
+                onAuthFailure();
             }
         });
     }
@@ -252,11 +262,13 @@
                 if(data.success){
                     location.href="${pageContext.request.contextPath}/index.jsp";
                 }else{
-                    alert(data.message)
+                    alert(data.message);
+                    onAuthFailure();
                 }
             },
             error: function () {
                 alert("请求服务器失败");
+                onAuthFailure();
             }
         });
     }

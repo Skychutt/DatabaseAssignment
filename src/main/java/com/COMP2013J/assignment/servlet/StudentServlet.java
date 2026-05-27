@@ -101,7 +101,9 @@ public class StudentServlet extends HttpServlet {
         if ("add".equals(r) || "edit".equals(r)) {
             Student student = new Student();
             student.setSno(req.getParameter("sno"));
-            student.setPassword(req.getParameter("password"));
+            if ("add".equals(r)) {
+                student.setPassword(req.getParameter("password"));
+            }
             student.setName(req.getParameter("name"));
             student.setTele(req.getParameter("tele"));
             student.setGender(req.getParameter("gender"));

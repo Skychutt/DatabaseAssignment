@@ -241,13 +241,18 @@
                     }
                 };
 
+                var lang = (window.I18N && I18N.getLang) ? I18N.getLang() : "en";
+                var clazzLabel = lang === "en" ? "Students" : "学生数";
+                var tcLabels = lang === "en" ? ["Teachers", "Courses"] : ["教师", "课程"];
+                var countLabel = lang === "en" ? "Count" : "数量";
+
                 var ctxClazz = $('.js-chartjs-clazz')[0].getContext('2d');
                 window.__chartClazz = new Chart(ctxClazz, {
                     type: 'bar',
                     data: {
                         labels: chartLabels,
                         datasets: [{
-                            label: '学生数',
+                            label: clazzLabel,
                             borderWidth: 1,
                             borderColor: 'rgba(0,0,0,0)',
                             backgroundColor: 'rgba(51,202,185,0.5)',
@@ -263,9 +268,9 @@
                 window.__chartTc = new Chart(ctxTc, {
                     type: 'bar',
                     data: {
-                        labels: ['教师', '课程'],
+                        labels: tcLabels,
                         datasets: [{
-                            label: '数量',
+                            label: countLabel,
                             borderWidth: 1,
                             borderColor: 'rgba(0,0,0,0)',
                             backgroundColor: [

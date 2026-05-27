@@ -31,11 +31,8 @@
                                             <label>学号</label>
                                             <input class="form-control" type="text" id="sno" value="<%= student == null ? "" : student.getSno() %>" readonly>
                                         </div>
-                                        <div class="col-md-6 form-group">
-                                            <label>密码</label>
-                                            <input class="form-control" type="password" id="password" value="" placeholder="留空则不修改密码">
-                                        </div>
                                     </div>
+                                    <p class="text-muted">密码由本人通过右上角「修改密码」维护，管理员不可查看或修改。</p>
                                     <div class="row">
                                         <div class="col-md-6 form-group">
                                             <label>姓名</label>
@@ -97,7 +94,6 @@
         $.post("${pageContext.request.contextPath}/student", {
             r: "edit",
             sno: $("#sno").val(),
-            password: $("#password").val(),
             name: $("#name").val(),
             tele: $("#tele").val(),
             enterdate: $("#enterdate").val(),

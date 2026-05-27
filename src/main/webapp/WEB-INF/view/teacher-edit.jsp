@@ -31,11 +31,8 @@
                                             <label>工号</label>
                                             <input class="form-control" type="text" id="tno" value="<%= teacher == null ? "" : teacher.getTno() %>" readonly>
                                         </div>
-                                        <div class="col-md-6 form-group">
-                                            <label>密码</label>
-                                            <input class="form-control" type="password" id="password" value="" placeholder="留空则不修改密码">
-                                        </div>
                                     </div>
+                                    <p class="text-muted">密码由本人通过右上角「修改密码」维护，管理员不可查看或修改。</p>
                                     <div class="form-group">
                                         <label>姓名</label>
                                         <input class="form-control" type="text" id="tname" value="<%= teacher == null || teacher.getTname() == null ? "" : teacher.getTname() %>">
@@ -63,7 +60,6 @@
         $.post("${pageContext.request.contextPath}/teacher", {
             r: "edit",
             tno: $("#tno").val(),
-            password: $("#password").val(),
             tname: $("#tname").val()
         }, function (res) {
             if (res.success) {
