@@ -1,4 +1,22 @@
 /* 右下角中英文切换 */
+/* Keep one font stack for both en/zh to avoid visual jitter when switching language. */
+html {
+    overflow-y: scroll;
+}
+
+html, body, button, input, select, textarea, .form-control, .btn, .table {
+    font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", Arial, sans-serif;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+body.lang-switching * {
+    transition: none !important;
+}
+
 #lang-switcher {
     position: fixed;
     right: 18px;

@@ -11,6 +11,19 @@
     "use strict";
 
     var STORAGE_KEY = "app_lang";
+    var currentLang = "en";
+    var isApplyingLanguage = false;
+    var langApplyTimer = null;
+
+    function readStoredLang() {
+        try {
+            var stored = sessionStorage.getItem(STORAGE_KEY);
+            if (stored === "zh" || stored === "en") {
+                return stored;
+            }
+        } catch (e) { /* ignore */ }
+        return "en";
+    }
 
     /** 中文 -> 英文（按长度降序替换，避免短词误伤） */
     var TEXT_MAP = {
@@ -459,17 +472,17 @@
     });
 
     function getLang() {
-        var stored = sessionStorage.getItem(STORAGE_KEY);
-        if (stored === "zh" || stored === "en") {
-            return stored;
-        }
-        return "en";
+        return currentLang;
     }
 
     function setLang(lang) {
-        if (lang === "zh" || lang === "en") {
-            sessionStorage.setItem(STORAGE_KEY, lang);
+        if (lang !== "zh" && lang !== "en") {
+            return;
         }
+        currentLang = lang;
+        try {
+            sessionStorage.setItem(STORAGE_KEY, lang);
+        } catch (e) { /* ignore */ }
         try {
             localStorage.removeItem(STORAGE_KEY);
         } catch (e) { /* ignore */ }
@@ -743,8 +756,15 @@
     }
 
     function applyLanguage(lang) {
+        if (isApplyingLanguage) {
+            return;
+        }
         if (lang !== "zh" && lang !== "en") {
             lang = "en";
+        }
+        isApplyingLanguage = true;
+        if (document.body) {
+            document.body.classList.add("lang-switching");
         }
         setLang(lang);
         document.documentElement.lang = lang === "en" ? "en" : "zh";
@@ -760,6 +780,15 @@
         try {
             document.dispatchEvent(new CustomEvent("app-lang-change", { detail: lang }));
         } catch (e) { /* ignore */ }
+        if (langApplyTimer) {
+            clearTimeout(langApplyTimer);
+        }
+        langApplyTimer = setTimeout(function () {
+            if (document.body) {
+                document.body.classList.remove("lang-switching");
+            }
+            isApplyingLanguage = false;
+        }, 16);
     }
 
     function translateMsg(msg) {
@@ -783,18 +812,18 @@
     }
 
     function initSwitcher() {
-        var zhBtn = document.getElementById("lang-btn-zh");
-        var enBtn = document.getElementById("lang-btn-en");
-        if (zhBtn) {
-            zhBtn.addEventListener("click", function () {
+        document.addEventListener("click", function (e) {
+            if (!e || !e.target || !e.target.id) {
+                return;
+            }
+            if (e.target.id === "lang-btn-zh") {
                 applyLanguage("zh");
-            });
-        }
-        if (enBtn) {
-            enBtn.addEventListener("click", function () {
+                return;
+            }
+            if (e.target.id === "lang-btn-en") {
                 applyLanguage("en");
-            });
-        }
+            }
+        });
     }
 
     function patchDialogs() {
@@ -824,6 +853,17 @@
     }
 
     function init() {
+        currentLang = readStoredLang();
+        try {
+            var u = new URL(window.location.href);
+            var qLang = u.searchParams.get("_lang");
+            if (qLang === "zh" || qLang === "en") {
+                currentLang = qLang;
+                setLang(qLang);
+                u.searchParams.delete("_lang");
+                window.history.replaceState({}, "", u.toString());
+            }
+        } catch (e0) { /* ignore */ }
         try {
             localStorage.removeItem(STORAGE_KEY);
         } catch (e) { /* ignore */ }
@@ -841,6 +881,9 @@
         observeDomChanges._started = true;
         var timer = null;
         var observer = new MutationObserver(function (mutations) {
+            if (isApplyingLanguage) {
+                return;
+            }
             if (getLang() !== "en") {
                 return;
             }
