@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `tb_admin`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tb_admin` (
   `username` varchar(20) NOT NULL,
-  `password` varchar(20) DEFAULT NULL,
+  `password` varchar(60) DEFAULT NULL,
   PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -35,7 +35,7 @@ CREATE TABLE `tb_admin` (
 
 LOCK TABLES `tb_admin` WRITE;
 /*!40000 ALTER TABLE `tb_admin` DISABLE KEYS */;
-INSERT INTO `tb_admin` VALUES ('admin','12345'),('auv','123');
+INSERT INTO `tb_admin` VALUES ('admin','12345'),('auv','$2a$10$xRkWcufSKpbzHsZbQIxkYuwn9JO3CuYmY/3vyRYul30t.bBlbx9ym');
 /*!40000 ALTER TABLE `tb_admin` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -59,7 +59,7 @@ CREATE TABLE `tb_clazz` (
 
 LOCK TABLES `tb_clazz` WRITE;
 /*!40000 ALTER TABLE `tb_clazz` DISABLE KEYS */;
-INSERT INTO `tb_clazz` VALUES ('1001','哈哈哈'),('243723','软件3班');
+INSERT INTO `tb_clazz` VALUES ('1001','class1'),('1002','class2'),('1003','class3'),('1004','class4'),('1005','class5');
 /*!40000 ALTER TABLE `tb_clazz` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -92,7 +92,7 @@ CREATE TABLE `tb_course` (
 
 LOCK TABLES `tb_course` WRITE;
 /*!40000 ALTER TABLE `tb_course` DISABLE KEYS */;
-INSERT INTO `tb_course` VALUES ('111111','001','体育','2026-05-01','2026-05-30',1.0,13,1,''),('A001','001','大二高数A','2024-11-07','2025-12-07',4.0,50,0,'高数学习1'),('A002','001','大二高数B','2024-11-07','2025-12-07',4.0,50,0,'高数学习2'),('A003','002','线性代数下','2024-11-07','2025-12-07',4.0,50,0,'线性代数学习');
+INSERT INTO `tb_course` VALUES ('A001','001','Politics','2026-05-01','2026-07-23',4.0,50,48,'PoliticsLearning'),('A002','001','Mathematics','2026-05-01','2026-07-23',4.0,50,48,'MathematicsLearning'),('A003','001','OOP','2024-05-01','2025-07-23',4.0,50,48,'JavaCodingLearning\n'),('A004','001','English','2026-05-01','2026-07-23',4.0,50,48,'EnglishLearning'),('A005','001','IrelandCulture','2026-05-01','2026-07-23',4.0,50,48,'IrelandCultureLearning'),('A006','001','PE','2026-05-01','2026-07-23',4.0,50,48,'PELearning'),('A007','001','Economy','2026-05-01','2026-07-23',4.0,50,48,'EconomyLearning');
 /*!40000 ALTER TABLE `tb_course` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -150,7 +150,6 @@ CREATE TABLE `tb_stu_course` (
 
 LOCK TABLES `tb_stu_course` WRITE;
 /*!40000 ALTER TABLE `tb_stu_course` DISABLE KEYS */;
-INSERT INTO `tb_stu_course` VALUES ('111111','1','2026-05-16',100.00,'wer');
 /*!40000 ALTER TABLE `tb_stu_course` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -163,7 +162,7 @@ DROP TABLE IF EXISTS `tb_student`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tb_student` (
   `sno` varchar(20) NOT NULL,
-  `password` varchar(20) DEFAULT NULL,
+  `password` varchar(60) DEFAULT NULL,
   `name` varchar(20) DEFAULT NULL,
   `tele` char(11) DEFAULT NULL,
   `enterdate` date DEFAULT NULL,
@@ -183,7 +182,7 @@ CREATE TABLE `tb_student` (
 
 LOCK TABLES `tb_student` WRITE;
 /*!40000 ALTER TABLE `tb_student` DISABLE KEYS */;
-INSERT INTO `tb_student` VALUES ('1','333','324','12','2026-05-08',4,'m','12','243723'),('111','111','www','678968','2026-05-13',8,'m','bjk','243723'),('12333','333','大侦探波洛','213','2026-04-29',2,'m','213','1001');
+INSERT INTO `tb_student` VALUES ('20240101','20240101','Dengtianyao','1234567890',NULL,18,'男','BDIC','1001'),('20240102','20240102','Wuguannan','1234567890',NULL,18,'男','BDIC','1001'),('20240103','20240103','Guoyi','1234567890',NULL,18,'女','BDIC','1001'),('20240201','$2a$10$19RU3/inr8OfjH6O5t2WmOLfkBKJlFRv93QI5bI4N6TblF4ya/.3.','Hanyuchen','1234567890',NULL,18,'女','BDIC','1002'),('20240202','20240202','Hanyuxiao','1234567890',NULL,18,'男','BDIC','1002'),('20240203','20240203','Hanyunima','1234567890',NULL,18,'女','BDIC','1002'),('20240301','20240301','Donk','1234567890',NULL,18,'男','BDIC','1003'),('20240302','20240302','Danking','1234567890',NULL,18,'男','BDIC','1003'),('20240303','20240303','Faerkong','1234567890',NULL,18,'女','BDIC','1003'),('20240401','20240401','Liuli','1234567890',NULL,18,'女','BDIC','1004'),('20240402','20240402','Zhangrao','1234567890',NULL,18,'女','BDIC','1004'),('20240403','20240403','Fujing','1234567890',NULL,18,'女','BDIC','1004'),('20240501','20240501','ZhengAndy','1234567890',NULL,18,'男','BDIC','1005'),('20240502','20240502','Nige','1234567890',NULL,18,'男','BDIC','1005'),('20240503','20240503','Tiger','1234567890',NULL,18,'男','BDIC','1005');
 /*!40000 ALTER TABLE `tb_student` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -223,7 +222,6 @@ CREATE TABLE `tb_student_archive` (
 
 LOCK TABLES `tb_student_archive` WRITE;
 /*!40000 ALTER TABLE `tb_student_archive` DISABLE KEYS */;
-INSERT INTO `tb_student_archive` VALUES ('ARC1','1','123456789098765432','汉族',' 北京','群众','专升本','软件工程','243723','111',0,'2026-05-19 19:13:20','2026-05-19 19:13:20','1q\'d\'s','11312345678');
 /*!40000 ALTER TABLE `tb_student_archive` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -236,7 +234,7 @@ DROP TABLE IF EXISTS `tb_teacher`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tb_teacher` (
   `tno` varchar(20) NOT NULL,
-  `password` varchar(20) DEFAULT NULL,
+  `password` varchar(60) DEFAULT NULL,
   `tname` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`tno`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
@@ -248,7 +246,7 @@ CREATE TABLE `tb_teacher` (
 
 LOCK TABLES `tb_teacher` WRITE;
 /*!40000 ALTER TABLE `tb_teacher` DISABLE KEYS */;
-INSERT INTO `tb_teacher` VALUES ('001','123','王老师'),('002','123','张老师'),('111000','111','郑薇薇');
+INSERT INTO `tb_teacher` VALUES ('001','123','Mathew'),('002','123','Paul'),('003','123','Jeferri'),('004','123','Emily'),('005','123','Imilio'),('006','123','Peter'),('007','123','Eco'),('008','123','Armstrong');
 /*!40000 ALTER TABLE `tb_teacher` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -261,4 +259,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-21 11:05:30
+-- Dump completed on 2026-05-28 22:21:38
